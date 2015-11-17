@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:focusable="true"
+    android:focusableInTouchMode="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:id="@+id/base_linear_layout">
+
+        <LinearLayout style="@style/labelFieldHolder">
+
+            <TextView
+                android:id="@+id/bill_amount_label"
+                android:text="@string/bill_amount"
+                style="@style/labelText"
+                />
+
+            <EditText
+                android:id="@+id/bill_amount_edit"
+                style="@style/editField"
+                />
+
+
+        </LinearLayout>
+
+        <LinearLayout style="@style/labelFieldHolder">
+
+            <TextView
+                android:id="@+id/tip_percent_label"
+                android:text="@string/tip_percent"
+                style="@style/labelText"
+                />
+
+            <EditText
+                android:id="@+id/tip_percent_edit"
+                style="@style/editField"
+                />
+
+            <!--Percent Sign <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/percent_sign"
+                android:id="@+id/percent_sign"
+                style="@style/defaultText"/>
+                -->
+
+
+        </LinearLayout>
+
+        <LinearLayout style="@style/labelFieldHolder">
+
+            <TextView
+                android:id="@+id/total_amount_label"
+                android:text="@string/total_amount"
+                style="@style/labelText"
+                />
+
+            <EditText
+                android:id="@+id/total_amount_edit"
+                style="@style/editField"
+                />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/split_total"
+                style="@style/defaultTextFormat" />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_add_circle_black_24dp"
+                android:id="@+id/split_toggle_button"
+                android:contentDescription="@string/toggle_content_description"
+                />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_below="@id/base_linear_layout"
+        android:id="@+id/split_check_layout"
+        android:visibility="invisible">
+
+        <LinearLayout style="@style/labelFieldHolder">
+
+            <TextView
+                android:id="@+id/number_people_label"
+                android:text="@string/number_people"
+                style="@style/labelText"
+                />
+
+            <EditText
+                android:id="@+id/number_people_edit"
+                style="@style/editField"
+                />
+
+
+        </LinearLayout>
+
+        <LinearLayout style="@style/labelFieldHolder">
+
+            <TextView
+                android:id="@+id/each_pays_label"
+                android:text="@string/each_person_pays"
+                style="@style/labelText"
+                />
+
+            <EditText
+                android:id="@+id/each_pays_edit"
+                style="@style/editField"
+                />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/button_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingTop="30dp"
+        android:layout_below="@+id/split_check_layout"
+        android:gravity="center">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/save_button"
+            android:id="@+id/save_button"
+            />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/clear_button"
+            android:id="@+id/clear_button"
+            />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="*manage database*"
+            android:id="@+id/delete_db"
+            />
+
+    </LinearLayout>
+
+
+</RelativeLayout>

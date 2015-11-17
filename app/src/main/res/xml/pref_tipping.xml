@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <ListPreference
+        android:title="@string/pref_method_label"
+        android:key="@string/pref_method_key"
+        android:defaultValue="@string/pref_method_default"
+        android:entries="@array/tipping_method_array_entries"
+        android:entryValues="@array/tipping_method_array_vaues"
+        />
+
+    <com.example.keegan.securetipping.NumberPickerPreference
+        android:title="@string/pref_tip_label"
+        android:key="@string/pref_tip_key"
+        android:defaultValue="@integer/pref_tip_default"
+        />
+
+
+</PreferenceScreen>

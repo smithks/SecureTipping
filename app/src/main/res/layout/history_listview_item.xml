@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:weightSum="2">
+
+    <LinearLayout
+        android:id="@+id/date_layout"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        >
+
+        <TextView
+            android:id="@+id/date_textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nov 12, 2015"
+            style="@style/historyEntryTextFormat"
+            />
+
+        <TextView
+            android:id="@+id/time_textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1:18 PM"
+            style="@style/historyEntryTextFormat"/>
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/paid_textView"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:text="$20.54"
+        android:gravity="center_vertical"
+        style="@style/historyEntryTextFormat"/>
+
+</LinearLayout>
