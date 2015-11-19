@@ -46,7 +46,7 @@ public class HistoryFragment extends Fragment {
         timeFormat = (SimpleDateFormat)SimpleDateFormat.getTimeInstance(DateFormat.SHORT);
         decimalFormat = new DecimalFormat("#0.00");
 
-        refreshHistoryEntries();
+        refreshHistory();
         return rootView;
     }
 
@@ -58,7 +58,7 @@ public class HistoryFragment extends Fragment {
     /**
      * Refreshes the listView in the history fragment with data from the history database.
      */
-    public void refreshHistoryEntries(){
+    public void refreshHistory(){
         new FetchHistoryEntries().execute();
     }
 

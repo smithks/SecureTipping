@@ -32,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
      */
     private ViewPager mViewPager;
     private final int HISTORY_PAGE_INDEX = 1;
+    private final int CALCULATOR_PAGE_INDEX = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,9 +61,11 @@ public class MainActivity extends AppCompatActivity {
              */
             @Override
             public void onPageSelected(int position) {
+                CalculatorPagerAdapter fragmentPagerAdapter = (CalculatorPagerAdapter) mViewPager.getAdapter();
                 if(position == HISTORY_PAGE_INDEX){
-                    CalculatorPagerAdapter fragmentPagerAdapter = (CalculatorPagerAdapter) mViewPager.getAdapter();
-                    ((HistoryFragment)fragmentPagerAdapter.getItem(HISTORY_PAGE_INDEX)).refreshHistoryEntries();
+                    ((HistoryFragment) fragmentPagerAdapter.getItem(HISTORY_PAGE_INDEX)).refreshHistory();
+                }else if(position == CALCULATOR_PAGE_INDEX){
+                    ((CalculatorFragment) fragmentPagerAdapter.getItem(CALCULATOR_PAGE_INDEX)).refreshCalculator();
                 }
             }
 
@@ -124,13 +128,15 @@ public class MainActivity extends AppCompatActivity {
      */
     public class CalculatorPagerAdapter extends FragmentPagerAdapter {
 
+        HistoryFragment historyFragment;
+        CalculatorFragment calculatorFragment;
+
         public CalculatorPagerAdapter(FragmentManager fm) {
             super(fm);
             historyFragment = new HistoryFragment();
             calculatorFragment = new CalculatorFragment();
         }
-        HistoryFragment historyFragment;
-        CalculatorFragment calculatorFragment;
+
 
         @Override
         public Fragment getItem(int position) {

@@ -31,24 +31,52 @@
 
         <LinearLayout style="@style/labelFieldHolder">
 
-            <TextView
-                android:id="@+id/tip_percent_label"
-                android:text="@string/tip_percent"
-                style="@style/labelText"
-                />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:layout_weight="1"
+                android:weightSum="6">
+
+                <TextView
+                    android:id="@+id/tip_percent_label"
+                    android:text="@string/tip_amount"
+                    style="@style/defaultTextFormat"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:layout_weight="3"
+                    />
+
+                <EditText
+                    android:id="@+id/tip_percent_edit"
+                    style="@style/defaultTextFormat"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="2"
+                    android:inputType="numberDecimal"
+                    android:ems="5"
+                    android:selectAllOnFocus="true"
+                    android:gravity="end"
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/percent_sign"
+                    android:id="@+id/percent_sign"
+                    style="@style/defaultTextFormat"
+                    android:layout_weight="1"/>
+            </LinearLayout>
 
             <EditText
-                android:id="@+id/tip_percent_edit"
+                android:id="@+id/tip_amount_edit"
                 style="@style/editField"
                 />
 
-            <!--Percent Sign <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/percent_sign"
-                android:id="@+id/percent_sign"
-                style="@style/defaultText"/>
-                -->
+
+
+
+
 
 
         </LinearLayout>

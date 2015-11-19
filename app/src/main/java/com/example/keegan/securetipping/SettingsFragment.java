@@ -10,11 +10,15 @@ import android.preference.PreferenceFragment;
  * Created by Keegan on 11/12/2015.
  */
 public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
+
+    SharedPreferences sPref;
+
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
 
         addPreferencesFromResource(R.xml.pref_tipping);
-        getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
+        sPref = getPreferenceScreen().getSharedPreferences();
+        sPref.registerOnSharedPreferenceChangeListener(this);
 
     }
 

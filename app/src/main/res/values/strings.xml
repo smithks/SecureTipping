@@ -9,9 +9,9 @@
     <string name="pref_tip_label">Default tip percent</string>
     <integer name="pref_tip_default">15</integer>
     <string name="pref_tip_key">defaultTip</string>
-    <string name="bill_amount">Bill amount</string>
-    <string name="tip_percent">Tip percent:</string>
-    <string name="total_amount">Total amount:</string>
+    <string name="bill_amount">Bill:</string>
+    <string name="tip_amount">Tip:</string>
+    <string name="total_amount">Total:</string>
     <string name="split_total">Split the check?</string>
     <string name="number_people">Number of people:</string>
     <string name="each_person_pays">Each person pays:</string>
