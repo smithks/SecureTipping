@@ -1,6 +1,9 @@
 package com.example.keegan.securetipping;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
@@ -10,27 +13,29 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.NumberPicker;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import com.example.keegan.securetipping.data.HistoryDbHelper;
 import com.example.keegan.securetipping.data.HistoryContract.HistoryEntry;
+import com.example.keegan.securetipping.data.HistoryDbHelper;
 
 import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.Date;
-//TODO create custom calculator for edit text fields
 //TODO edit button appearance, make purple color?
-//TODO change tip & # person to slider
 //TODO fix database leaking, close on pause and such
-//TODO include tip value in UI, have to write that down
+//TODO include about page describing each method, indicate why methods may not be the best for lower/larger amounts (large descrepancy in tip percent vs actual tip percent)
+//TODO make interface nice, make total larger.
+//TODO improve history section, make searchable? Pop up item on click, show detailed view. Allow delete.
 /**
  * Calculator fragment displayed within viewpager.
  * @author Keegan Smith
@@ -47,6 +52,7 @@ public class CalculatorFragment extends Fragment {
     private String[] TIPPING_METHODS;
     DecimalFormat mDecimalFormat = new DecimalFormat("#0.00");
 
+    private LinearLayout mSplitCheckLayout;
     private EditText mBillAmountEdit;
     private EditText mTipPercentEdit;
     private EditText mTipAmountEdit;
@@ -59,6 +65,7 @@ public class CalculatorFragment extends Fragment {
     private Boolean mSplitCheckDisplayed; //Denotes if the split check layout is being displayed
     private Boolean mIgnoreTextChange;  //Flags the textChange listener to not update (used when a field is set programmatically)
     private Boolean mMethodChanged; //If tip method changes on screen load clear fields and lock fields appropriately.
+    private Boolean mOverrideTipMethod; //Called if user temporarily changes tip method
 
     /**
      *
@@ -77,8 +84,8 @@ public class CalculatorFragment extends Fragment {
      * Initializes all member variables and sets listeners.
      * @param rootView the rootView for this fragment
      */
-    public void initializeFields(View rootView){
-        final LinearLayout splitCheckLayout = (LinearLayout) rootView.findViewById(R.id.split_check_layout);
+    public void initializeFields(final View rootView){
+        mSplitCheckLayout = (LinearLayout) rootView.findViewById(R.id.split_check_layout);
 
 
 
@@ -95,6 +102,7 @@ public class CalculatorFragment extends Fragment {
 
         mSplitCheckDisplayed = false;
         TIPPING_METHODS = getResources().getStringArray(R.array.tipping_method_array_vaues);
+        mOverrideTipMethod = false;
         pullPreferenceValues();
 
         mBillAmountEdit.addTextChangedListener(new TextChangeListener(this, mBillAmountEdit));
@@ -102,7 +110,29 @@ public class CalculatorFragment extends Fragment {
         mTipAmountEdit.addTextChangedListener(new TextChangeListener(this, mTipAmountEdit));
         mTotalAmountEdit.addTextChangedListener(new TextChangeListener(this, mTotalAmountEdit));
         mNumberPeopleEdit.addTextChangedListener(new TextChangeListener(this, mNumberPeopleEdit));
-        mEachPaysEdit.setEnabled(false);
+        disableView(mEachPaysEdit); //Don't allow users to edit the each pays field
+
+        mTipPercentEdit.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                clearViewFocus(rootView); //Remove focus from other editText views that may have it
+                if (event.getAction() == MotionEvent.ACTION_UP)
+                    showPickerDialog(mTipPercentEdit);
+                return true;
+            }
+        });
+
+        mNumberPeopleEdit.setOnTouchListener(new View.OnTouchListener(){
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                clearViewFocus(rootView); //Remove focus from other editText views that may have it
+                if (event.getAction() == MotionEvent.ACTION_UP)
+                    showPickerDialog(mNumberPeopleEdit);
+                return true;
+            }
+        });
+
 
         //TODO remove database viewer
         Button b = (Button)rootView.findViewById(R.id.delete_db);
@@ -116,11 +146,14 @@ public class CalculatorFragment extends Fragment {
             }
         });
 
+        //EditorInfo.ACTION
+
         //Zero out fields on click
         mClearButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 resetTextFields();
+                clearViewFocus(rootView);
             }
         });
 
@@ -135,15 +168,19 @@ public class CalculatorFragment extends Fragment {
         mToggleSplitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mSplitCheckDisplayed) {
-                    splitCheckLayout.setVisibility(View.INVISIBLE);
-                    mToggleSplitButton.setImageResource(R.drawable.ic_add_circle_black_24dp);
-                    mSplitCheckDisplayed = false;
+                if(TIP_METHOD.equals(TIPPING_METHODS[1])){
+                    showNormalTipAlertDialog();
+                }else {
+                    if (mSplitCheckDisplayed) {
+                        mSplitCheckLayout.setVisibility(View.INVISIBLE);
+                        mToggleSplitButton.setImageResource(R.drawable.ic_add_circle_black_24dp);
+                        mSplitCheckDisplayed = false;
 
-                } else {
-                    splitCheckLayout.setVisibility(View.VISIBLE);
-                    mToggleSplitButton.setImageResource(R.drawable.ic_remove_circle_black_24dp);
-                    mSplitCheckDisplayed = true;
+                    } else {
+                        mSplitCheckLayout.setVisibility(View.VISIBLE);
+                        mToggleSplitButton.setImageResource(R.drawable.ic_remove_circle_black_24dp);
+                        mSplitCheckDisplayed = true;
+                    }
                 }
             }
         });
@@ -152,7 +189,6 @@ public class CalculatorFragment extends Fragment {
         mMethodChanged = false;
         resetTextFields(); //Set fields to default values
         updateFieldProperties();
-
     }
 
 
@@ -160,6 +196,13 @@ public class CalculatorFragment extends Fragment {
     @Override
     public void onResume(){
         super.onResume();
+        mOverrideTipMethod = false;
+        if(mSplitCheckDisplayed){
+            mSplitCheckLayout.setVisibility(View.INVISIBLE);
+            mToggleSplitButton.setImageResource(R.drawable.ic_add_circle_black_24dp);
+            mSplitCheckDisplayed = false;
+        }
+
         refreshCalculator();
     }
 
@@ -167,8 +210,6 @@ public class CalculatorFragment extends Fragment {
      * Refreshes values of fields. Called when the screen is scrolled to in page viewer or return from settings.
      */
     public void refreshCalculator(){
-        //TODO keep values in fields if tip method has not changed. Change tip amount if from settings.
-        //TODO lock fields based on tip method (lock tip amount on non-normal, etc..)
         pullPreferenceValues();
         resetTextFields();
         if (mMethodChanged) {
@@ -177,19 +218,44 @@ public class CalculatorFragment extends Fragment {
         }
     }
 
+    /**
+     * Enables or disables fields based on current tipping method. Some fields should not be modified in order to maintain proper usage.
+     */
     public void updateFieldProperties(){
         if (TIP_METHOD.equals(TIPPING_METHODS[0])){ //normal
-            mTipAmountEdit.setEnabled(true);
+//            mTipAmountEdit.setEnabled(true);
+//            mTotalAmountEdit.setEnabled(true);
+            enableView(mTipAmountEdit);
+            enableView(mTotalAmountEdit);
         } else if(TIP_METHOD.equals(TIPPING_METHODS[1])){ //palindrome
-            mTipAmountEdit.setEnabled(false);
+//            mTipAmountEdit.setEnabled(false);
+//            mTotalAmountEdit.setEnabled(false);
+            disableView(mTipAmountEdit);
+            disableView(mTotalAmountEdit);
         }
     }
 
+    private void disableView(View view){
+        view.setEnabled(false);
+        view.setFocusable(false);
+    }
+
+    private void enableView(View view){
+        view.setEnabled(true);
+        view.setFocusable(true);
+    }
+
+    private void clearViewFocus(View rootView){
+        View focusChild = ((RelativeLayout)rootView.findViewById(R.id.calculator_layout)).getFocusedChild();
+        if (focusChild != null)
+            focusChild.clearFocus();
+    }
+
     /**
-     *Resets edit text
+     *Resets edit text fields to default values.
      */
     public void resetTextFields() {
-        mIgnoreTextChange = true;
+        mIgnoreTextChange = true;   //Ignore text field text change listeners when setting default values
         String formattedZero = mDecimalFormat.format(0);
         mBillAmountEdit.setText(formattedZero);
         mTipPercentEdit.setText(DEFAULT_TIP);
@@ -207,11 +273,13 @@ public class CalculatorFragment extends Fragment {
     public void pullPreferenceValues(){
         SharedPreferences sPref = PreferenceManager.getDefaultSharedPreferences(getContext());
         DEFAULT_TIP = Integer.toString(sPref.getInt(getString(R.string.pref_tip_key), R.integer.pref_tip_default));
-        String newMethod = sPref.getString(getString(R.string.pref_method_key), getString(R.string.pref_method_default));
-        if (TIP_METHOD != null) //If this is not the initial preference load
-            if(!TIP_METHOD.equals(newMethod)) //If the new value is different than previous
-                mMethodChanged = true;
-        TIP_METHOD = newMethod;
+        if (!mOverrideTipMethod) {
+            String newMethod = sPref.getString(getString(R.string.pref_method_key), getString(R.string.pref_method_default));
+            if (TIP_METHOD != null) //If this is not the initial preference load
+                if (!TIP_METHOD.equals(newMethod)) //If the new method is different than previous
+                    mMethodChanged = true;
+            TIP_METHOD = newMethod;
+        }
     }
 
     /**
@@ -234,11 +302,12 @@ public class CalculatorFragment extends Fragment {
 
         mIgnoreTextChange = true; //Disable text change listeners while updating programmatically.
 
-
+        String valStr;
         //Collect current values stored in fields
-        //TODO don't crash if user enters . first
         if (mBillAmountEdit.getText().length() > 0){
-            bill = Double.parseDouble(mBillAmountEdit.getText().toString());
+            valStr = mBillAmountEdit.getText().toString();
+            if(!valStr.equals("."))
+                bill = Double.parseDouble(valStr);
         }
         if (mTipPercentEdit.getText().length() > 0 ){
             String tipRaw = mTipPercentEdit.getText().toString();
@@ -251,48 +320,34 @@ public class CalculatorFragment extends Fragment {
             tipPercent = Double.parseDouble(tipRaw);
         }
         if (mTipAmountEdit.getText().length() > 0){
-            tipAmount = Double.parseDouble(mTipAmountEdit.getText().toString());
+            valStr = mTipAmountEdit.getText().toString();
+            if(!valStr.equals("."))
+                tipAmount = Double.parseDouble(valStr);
         }
         if (mTotalAmountEdit.getText().length()>0){
-            total = Double.parseDouble(mTotalAmountEdit.getText().toString());
+            valStr = mTotalAmountEdit.getText().toString();
+            if(!valStr.equals("."))
+                total = Double.parseDouble(valStr);
         }
         if (mNumberPeopleEdit.getText().length() > 0) {
             people = Double.parseDouble(mNumberPeopleEdit.getText().toString());
         }
         if (mEachPaysEdit.getText().length() > 0){
-            eachPays = Double.parseDouble(mEachPaysEdit.getText().toString());
+            valStr = mEachPaysEdit.getText().toString();
+            if (!valStr.equals("."))
+                eachPays = Double.parseDouble(valStr);
         }
-        Log.v(APPTAG, "bill " + bill + " tip " + tipPercent + " total " + total);//+tip+" total"+total);
 
         //Update fields
-//        if (caller.getId() == mBillAmountEdit.getId()){
-//            total = calculateTotal(bill, tipPercent);
-//            mTotalAmountEdit.setText(mDecimalFormat.format(total));
-//            mEachPaysEdit.setText(mDecimalFormat.format(calculateEachPays(total,people)));
-//        } else if(caller.getId() == this.mTipPercentEdit.getId()){
-//                total = calculateTotal(bill, tipPercent);
-//                mTotalAmountEdit.setText(mDecimalFormat.format(total));
-//                if (mSplitCheckDisplayed){
-//                    mEachPaysEdit.setText(mDecimalFormat.format(calculateEachPays(total,people)));
-//                }
-//        } else if (caller.getId() == mTotalAmountEdit.getId()) {
-//            //TODO update tip percent using calculate percent
-//        } else if(caller.getId() == mNumberPeopleEdit.getId()){
-//            if(people > 0){
-//                mEachPaysEdit.setText(mDecimalFormat.format(calculateEachPays(total,people)));
-//            }
-//        }
-
-
         if (caller.getId() == mBillAmountEdit.getId()){
-            tipAmount = updateTipAmount(bill, tipPercent);
-            total = updateTotalAmounts(bill, tipAmount, people);
+            total = updateTotalAmounts(bill, tipPercent, people);
+            tipAmount = updateTipAmountFromTotal(bill, total);
         } else if (caller.getId() == mTipPercentEdit.getId()){
-            tipAmount = updateTipAmount(bill, tipPercent);
-            total = updateTotalAmounts(bill, tipAmount, people);
+            total = updateTotalAmounts(bill, tipPercent, people);
+            tipAmount = updateTipAmountFromTotal(bill, total);
         } else if (caller.getId() == mTipAmountEdit.getId()){
             tipPercent = updateTipPercent(bill, tipAmount);
-            total = updateTotalAmounts(bill, tipAmount, people);
+            total = updateTotalAmounts(bill, tipPercent, people);
         } else if (caller.getId() == mTotalAmountEdit.getId()){
             tipAmount = updateTipAmountFromTotal(bill, total);
             tipPercent = updateTipPercent(bill, tipAmount);
@@ -322,47 +377,16 @@ public class CalculatorFragment extends Fragment {
         return tipAmount;
     }
 
-    private double updateTotalAmounts(double bill, double tipAmount, double people){
-        double total = bill + tipAmount;
-        updateEachPays(total, people);
-        mTotalAmountEdit.setText(mDecimalFormat.format(total));
-        return total;
-    }
-
-    private double updateEachPays(double total, double people){
-        double eachPays = total / people;
-        mEachPaysEdit.setText(mDecimalFormat.format(eachPays));
-        return eachPays;
-    }
-
-    private double updateTipPercent(double bill, double tipAmount){
-        double tipPercent = 0;
-        if (bill > 0) //Don't divide by zero
-            tipPercent= tipAmount / bill;
-        double tipPercentRead = tipPercent * 100;
-        String tip = Double.toString(tipPercentRead);
-        if (tip.contains(".")) {
-            int index = tip.indexOf(".");
-            tip = tip.substring(0, index);
-        }
-        mTipPercentEdit.setText(tip);
-        return tipPercent;
-    }
-
     /**
      * Calculates the total field based on the currently selected tipping method.
      * @param bill The current value of the bill
      * @param tipPercent the current value of the tip percent
+     * @param people the current value for number of people
      * @return the new value of the total
      */
-    public double calculateTotal(double bill, double tipPercent){
-        double total = 0;
-        double tip = 1+tipPercent;
-        if(TIP_METHOD.equals(TIPPING_METHODS[0])){//normal
-            total = bill * tip;
-            Log.v(APPTAG,total+"");
-        }else if(TIP_METHOD.equals(TIPPING_METHODS[1])) {//palindrome
-            total = bill * tip;
+    private double updateTotalAmounts(double bill, double tipPercent, double people){
+        double total = bill + (bill * tipPercent);;
+        if(TIP_METHOD.equals(TIPPING_METHODS[1])) {//palindrome
             if(total > 0) {
                 String mirrorAmount = Double.toString(total).split("\\.")[0];
                 String newTotal = mirrorAmount;
@@ -376,11 +400,48 @@ public class CalculatorFragment extends Fragment {
                     }
                     total = Double.parseDouble(newTotal);
                 }
+                //TODO display actual tip?
+                double tip = calculateTipPercent(bill,(bill * tipPercent));
+                double difference = Math.abs(tipPercent - tip);
             }
         }
+        updateEachPays(total, people);
+        mTotalAmountEdit.setText(mDecimalFormat.format(total));
         return total;
-
     }
+
+    private double updateEachPays(double total, double people){
+        double eachPays = total / people;
+        mEachPaysEdit.setText(mDecimalFormat.format(eachPays));
+        return eachPays;
+    }
+
+    private double updateTipPercent(double bill, double tipAmount){
+        double tipPercent = calculateTipPercent(bill, tipAmount);
+        String tip = Double.toString(tipPercent);
+        mTipPercentEdit.setText(tip);
+        return tipPercent;
+    }
+
+    /**
+     * Calculates the tip percent using the bill and the tipAmount
+     * @return tipPercent as a decimal (25% == .25)
+     */
+    private double calculateTipPercent(double bill, double tipAmount){
+        double tipPercent = 0;
+        if (bill > 0) //Don't divide by zero
+            tipPercent= tipAmount / bill;
+        double tipPercentRead = tipPercent * 100;
+        String tip = Double.toString(tipPercentRead);
+        if (tip.contains(".")) {
+            int index = tip.indexOf(".");
+            tip = tip.substring(0, index);
+        }
+        return tipPercent;
+    }
+
+
+
 
     /**
      * Calculates the each pays field that denotes how much each person would have to pay to add up to the
@@ -404,6 +465,79 @@ public class CalculatorFragment extends Fragment {
         return 0;
     }
 
+
+    private void showNormalTipAlertDialog(){
+        AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
+        dialog.setTitle("Check splitting is unavailable"); //TODO add these to strings xml
+        dialog.setMessage("We cannot maintain the secure palindrome pattern for each persons check without altering the original total. To split the check, temporarily switch to " +
+                "normal calculation by pressing the corresponding button below or change your default calculation method in settings.");
+        dialog.setNeutralButton("Use normal calculation", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                TIP_METHOD = TIPPING_METHODS[0]; //Set tipping method to normal for duration of this activity
+                mOverrideTipMethod = true;
+                updateFields(mBillAmountEdit); //Recalculate fields
+                updateFieldProperties();
+                mSplitCheckLayout.setVisibility(View.VISIBLE);
+                mToggleSplitButton.setImageResource(R.drawable.ic_remove_circle_black_24dp);
+                mSplitCheckDisplayed = true;
+                dialog.dismiss();
+            }
+        });
+
+        dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+
+    }
+
+    /**
+     * Displays a number picker dialog that will be used when the user presses the tip percent or number of people edit texts.
+     * @param caller The calling editText object.
+     */
+    private void showPickerDialog(final EditText caller){
+
+        final Dialog dialog = new Dialog(getContext());
+        if (caller.getId() == mTipPercentEdit.getId())
+            dialog.setTitle("Tip percentage"); //TODO pull strings from strings xml
+        else
+            dialog.setTitle("Number of people");
+        dialog.setContentView(R.layout.number_picker_dialog);
+        final NumberPicker picker = (NumberPicker) dialog.findViewById(R.id.dialog_number_picker);
+        Button okButton = (Button) dialog.findViewById(R.id.dialog_ok_button);
+        Button cancelButton = (Button) dialog.findViewById(R.id.dialog_cancel_button);
+
+        picker.setMaxValue(100);
+        //TODO BUG: open app, insert value for tip amount, touch tip percent, crash
+        picker.setMinValue(caller.getId() == mTipPercentEdit.getId() ? 0 : 1);
+        picker.setValue(Integer.parseInt(caller.getText().toString()));
+        picker.setWrapSelectorWheel(false);
+
+        okButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                picker.clearFocus();
+                caller.setText(Integer.toString(picker.getValue()));
+                dialog.dismiss();
+            }
+        });
+
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+
+
+    }
     /**
      * Text Change Listener that will listen for any key presses within the editText fields of the calculator.
      * Will dynamically update other fields whenever a change is detected.

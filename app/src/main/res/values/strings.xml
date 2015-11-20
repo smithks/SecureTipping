@@ -3,7 +3,7 @@
     <string name="action_settings">Settings</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
-    <string name="pref_method_label">Tipping method</string>
+    <string name="pref_method_label">Calculation method</string>
     <string name="pref_method_default" translatable="false">normal</string>
     <string name="pref_method_key" translatable="false">method</string>
     <string name="pref_tip_label">Default tip percent</string>

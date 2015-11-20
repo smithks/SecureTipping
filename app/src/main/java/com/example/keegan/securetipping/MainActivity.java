@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
                 if(position == HISTORY_PAGE_INDEX){
                     ((HistoryFragment) fragmentPagerAdapter.getItem(HISTORY_PAGE_INDEX)).refreshHistory();
                 }else if(position == CALCULATOR_PAGE_INDEX){
-                    ((CalculatorFragment) fragmentPagerAdapter.getItem(CALCULATOR_PAGE_INDEX)).refreshCalculator();
+                    //((CalculatorFragment) fragmentPagerAdapter.getItem(CALCULATOR_PAGE_INDEX)).refreshCalculator();
                 }
             }
 

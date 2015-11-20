@@ -4,6 +4,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/calculator_layout"
     android:focusable="true"
     android:focusableInTouchMode="true">
 
@@ -24,6 +25,7 @@
             <EditText
                 android:id="@+id/bill_amount_edit"
                 style="@style/editField"
+                android:inputType="numberDecimal"
                 />
 
 
@@ -53,7 +55,6 @@
                     android:layout_height="wrap_content"
                     android:layout_width="0dp"
                     android:layout_weight="2"
-                    android:inputType="numberDecimal"
                     android:ems="5"
                     android:selectAllOnFocus="true"
                     android:gravity="end"
@@ -71,6 +72,7 @@
             <EditText
                 android:id="@+id/tip_amount_edit"
                 style="@style/editField"
+                android:inputType="numberDecimal"
                 />
 
 
@@ -92,6 +94,7 @@
             <EditText
                 android:id="@+id/total_amount_edit"
                 style="@style/editField"
+                android:inputType="numberDecimal"
                 />
 
 
@@ -138,7 +141,12 @@
 
             <EditText
                 android:id="@+id/number_people_edit"
-                style="@style/editField"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:selectAllOnFocus="true"
+                android:ems="5"
+                android:layout_weight="1"
+                style="@style/defaultTextFormat"
                 />
 
 
