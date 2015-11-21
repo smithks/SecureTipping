@@ -21,6 +21,14 @@
     <string name="toggle_content_description">Add or remove check split section.</string>
     <string name="toast_store_successful">Transaction saved to history</string>
     <string name="toast_store_failed">Sorry! Something went wrong</string>
+    <string name="detail_date">"Transaction date:   "</string>
+    <string name="detail_you_paid">"You paid:  "</string>
+    <string name="detail_number_people">"Number of people:  "</string>
+    <string name="detail_calculated_total">"Calculated total:  "</string>
+    <string name="detail_bill">"Bill:  "</string>
+    <string name="detail_method">"Calculation method:  "</string>
+    <string name="detail_tip_amount">"Tip amount:  "</string>
+    <string name="detail_tip_percent">"Tip percent:  "</string>
     <string-array name="tipping_method_array_entries">
         <item>Normal</item>
         <item>Palindrome</item>

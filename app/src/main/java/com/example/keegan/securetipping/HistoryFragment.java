@@ -1,7 +1,9 @@
 package com.example.keegan.securetipping;
 
 
+import android.content.Intent;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -9,12 +11,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
-import com.example.keegan.securetipping.data.HistoryDbHelper;
 import com.example.keegan.securetipping.data.HistoryContract.HistoryEntry;
+import com.example.keegan.securetipping.data.HistoryDbHelper;
 
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -35,12 +38,13 @@ public class HistoryFragment extends Fragment {
     private SimpleDateFormat dateFormat;
     private SimpleDateFormat timeFormat;
     private DecimalFormat decimalFormat;
-
+    private SQLiteDatabase db;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.history_fragment, container, false);
+        db = HistoryDbHelper.getInstance(getContext()).getReadableDatabase();
         listView = (ListView)rootView.findViewById(R.id.history_listview);
         dateFormat = (SimpleDateFormat)SimpleDateFormat.getDateInstance();  //TODO do not show year if current year?
         timeFormat = (SimpleDateFormat)SimpleDateFormat.getTimeInstance(DateFormat.SHORT);
@@ -51,8 +55,9 @@ public class HistoryFragment extends Fragment {
     }
 
     @Override
-    public void onPause(){
-        super.onPause();
+    public void onDestroy(){
+        super.onDestroy();
+        db.close();
     }
 
     /**
@@ -73,7 +78,9 @@ public class HistoryFragment extends Fragment {
         return format.format(newDate);
     }
 
-
+    /**
+     * Fetches history entries and populates list view from SimpleCursorAdapter.
+     */
     private class FetchHistoryEntries extends AsyncTask<Void,Void,Cursor>{
 
         @Override
@@ -81,7 +88,7 @@ public class HistoryFragment extends Fragment {
             //TODO modify query to get restricted results, drop boxes for date range/price/etc.. send as params to asynctask
             String[] column = new String[] {HistoryEntry._ID,HistoryEntry.COLUMN_DATE,HistoryEntry.COLUMN_EACH_PAYS};
             String orderBy = HistoryEntry.COLUMN_DATE +" DESC";
-            return HistoryDbHelper.getInstance(getContext()).getReadableDatabase().query(HistoryEntry.TABLE_NAME,column,null,null,null,null,orderBy,null);
+            return db.query(HistoryEntry.TABLE_NAME,column,null,null,null,null,orderBy,null);
         }
 
         /**
@@ -92,7 +99,7 @@ public class HistoryFragment extends Fragment {
         protected void onPostExecute(Cursor result){
             String[] fromColumns = new String[] {HistoryEntry.COLUMN_DATE,HistoryEntry.COLUMN_EACH_PAYS};
             int[] toViews = new int[]{R.id.date_layout,R.id.paid_textView};
-            adapter = new SimpleCursorAdapter(getContext(),R.layout.history_listview_item,result,fromColumns,toViews);
+            adapter = new SimpleCursorAdapter(getContext(),R.layout.history_listview_item,result,fromColumns,toViews,SimpleCursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
             //Set custom handling of views through viewBinder
             adapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
 
@@ -129,6 +136,13 @@ public class HistoryFragment extends Fragment {
                 }
             });
             listView.setAdapter(adapter);
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Intent intent = new Intent(getActivity(),DetailActivity.class);
+                    startActivity(intent);
+                }
+            });
         }
     }
 }

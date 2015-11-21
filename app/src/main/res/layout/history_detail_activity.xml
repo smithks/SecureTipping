@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="10dp">
+
+        <RelativeLayout
+            android:id="@+id/detail_date_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            >
+
+            <TextView
+                android:id="@+id/detail_date_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/detail_date"
+                style="@style/historyEntryTextFormat"/>
+
+            <TextView
+                android:id="@+id/detail_date_textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Nov 12, 2015"
+                style="@style/historyEntryTextFormat"
+                android:layout_toRightOf="@+id/detail_date_label"
+                />
+
+            <TextView
+                android:id="@+id/detail_time_textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1:18 PM"
+                android:layout_below="@+id/detail_date_textView"
+                android:layout_alignLeft="@+id/detail_date_textView"
+                style="@style/historyEntryTextFormat"/>
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="center_horizontal">
+
+            <TextView
+                android:id="@+id/detail_you_paid_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/historyEntryTextFormat"
+                android:text="@string/detail_you_paid"
+                android:layout_gravity="center_vertical"/>
+
+            <TextView
+                android:id="@+id/detail_you_paid_textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:textSize="50sp"
+                android:text="$53.35"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="30dp">
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal">
+
+            <TextView
+                android:id="@+id/detail_bill_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/historyEntryTextFormat"
+                android:text="@string/detail_bill"
+                android:layout_alignRight="@+id/detail_method_label"
+                />
+
+            <TextView
+                android:id="@+id/detail_bill_textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/historyEntryTextFormat"
+                android:layout_toRightOf="@+id/detail_bill_label"
+                android:text="$45.00"
+                />
+
+            <TextView
+                android:id="@+id/detail_tip_percent_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/historyEntryTextFormat"
+                android:text="@string/detail_tip_percent"
+                android:layout_below="@+id/detail_bill_textView"
+                android:layout_alignRight="@+id/detail_method_label"
+                />
+
+            <TextView
+                android:id="@+id/detail_tip_percent_textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/historyEntryTextFormat"
+                android:layout_below="@+id/detail_bill_textView"
+                android:layout_toRightOf="@+id/detail_tip_percent_label"
+                android:text="19%"
+                />
+
+            <TextView
+                android:id="@+id/detail_tip_amount_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/historyEntryTextFormat"
+                android:text="@string/detail_tip_amount"
+                android:layout_alignRight="@+id/detail_method_label"
+                android:layout_below="@+id/detail_tip_percent_label"
+                />
+
+            <TextView
+                android:id="@+id/detail_tip_amount_textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/historyEntryTextFormat"
+                android:text="$8.35"
+                android:layout_below="@+id/detail_tip_percent_label"
+                android:layout_toRightOf="@+id/detail_tip_amount_label"
+                />
+
+            <TextView
+                android:id="@+id/detail_total_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/historyEntryTextFormat"
+                android:layout_alignRight="@+id/detail_method_label"
+                android:text="@string/detail_calculated_total"
+                android:layout_below="@id/detail_tip_amount_label"
+                />
+
+            <TextView
+                android:id="@+id/detail_total_textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/historyEntryTextFormat"
+                android:text="$53.35"
+                android:layout_below="@+id/detail_tip_amount_label"
+                android:layout_toRightOf="@+id/detail_total_label"
+                />
+
+            <TextView
+                android:id="@+id/detail_method_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/historyEntryTextFormat"
+                android:text="@string/detail_method"
+                android:layout_below="@+id/detail_total_label"
+                />
+
+            <TextView
+                android:id="@+id/detail_method_textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/historyEntryTextFormat"
+                android:text="Palindrome"
+                android:layout_below="@+id/detail_total_label"
+                android:layout_toRightOf="@+id/detail_method_label"
+                />
+
+            <TextView
+                android:id="@+id/detail_number_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/historyEntryTextFormat"
+                android:text="@string/detail_number_people"
+                android:layout_alignRight="@+id/detail_method_label"
+                android:layout_below="@+id/detail_method_label"
+                />
+
+            <TextView
+                android:id="@+id/detail_number_textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/historyEntryTextFormat"
+                android:text="1"
+                android:layout_below="@+id/detail_method_label"
+                android:layout_toRightOf="@+id/detail_number_label"
+                />
+
+        </RelativeLayout>
+
+    </LinearLayout>
+</LinearLayout>

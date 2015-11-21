@@ -43,14 +43,13 @@ import java.util.Date;
  */
 public class CalculatorFragment extends Fragment {
 
-    SQLiteDatabase db;
+    private SQLiteDatabase db;
 
-    public static final String APPTAG = "Secure Tipping";
-    private final int BLANK_FIELD = -1;
-    private String DEFAULT_TIP; //TODO make setting
+    private static final String APPTAG = "Secure Tipping";
+    private String DEFAULT_TIP;
     private String TIP_METHOD;
     private String[] TIPPING_METHODS;
-    DecimalFormat mDecimalFormat = new DecimalFormat("#0.00");
+    private DecimalFormat mDecimalFormat = new DecimalFormat("#0.00");
 
     private LinearLayout mSplitCheckLayout;
     private EditText mBillAmountEdit;
@@ -76,7 +75,7 @@ public class CalculatorFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.calculator_fragment, container, false);
 
         initializeFields(rootView);
-
+        db = HistoryDbHelper.getInstance(getContext()).getWritableDatabase();
         return rootView;
     }
 
@@ -84,10 +83,8 @@ public class CalculatorFragment extends Fragment {
      * Initializes all member variables and sets listeners.
      * @param rootView the rootView for this fragment
      */
-    public void initializeFields(final View rootView){
+    private void initializeFields(final View rootView){
         mSplitCheckLayout = (LinearLayout) rootView.findViewById(R.id.split_check_layout);
-
-
 
         mBillAmountEdit = (EditText) rootView.findViewById(R.id.bill_amount_edit);
         mTipPercentEdit = (EditText) rootView.findViewById(R.id.tip_percent_edit);
@@ -115,7 +112,7 @@ public class CalculatorFragment extends Fragment {
         mTipPercentEdit.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                clearViewFocus(rootView); //Remove focus from other editText views that may have it
+                clearViewFocus(); //Remove focus from other editText views that may have it
                 if (event.getAction() == MotionEvent.ACTION_UP)
                     showPickerDialog(mTipPercentEdit);
                 return true;
@@ -126,7 +123,7 @@ public class CalculatorFragment extends Fragment {
 
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                clearViewFocus(rootView); //Remove focus from other editText views that may have it
+                clearViewFocus(); //Remove focus from other editText views that may have it
                 if (event.getAction() == MotionEvent.ACTION_UP)
                     showPickerDialog(mNumberPeopleEdit);
                 return true;
@@ -153,7 +150,7 @@ public class CalculatorFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 resetTextFields();
-                clearViewFocus(rootView);
+                clearViewFocus();
             }
         });
 
@@ -192,7 +189,9 @@ public class CalculatorFragment extends Fragment {
     }
 
 
-
+    /**
+     * Resets calculator and pulls preference values.
+     */
     @Override
     public void onResume(){
         super.onResume();
@@ -204,6 +203,12 @@ public class CalculatorFragment extends Fragment {
         }
 
         refreshCalculator();
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        db.close();
     }
 
     /**
@@ -219,43 +224,56 @@ public class CalculatorFragment extends Fragment {
     }
 
     /**
-     * Enables or disables fields based on current tipping method. Some fields should not be modified in order to maintain proper usage.
+     * Enables or disables fields based on current tipping method. Some fields should not be
+     *  modified in order to maintain proper usage.
      */
-    public void updateFieldProperties(){
+    private void updateFieldProperties(){
         if (TIP_METHOD.equals(TIPPING_METHODS[0])){ //normal
-//            mTipAmountEdit.setEnabled(true);
-//            mTotalAmountEdit.setEnabled(true);
             enableView(mTipAmountEdit);
             enableView(mTotalAmountEdit);
         } else if(TIP_METHOD.equals(TIPPING_METHODS[1])){ //palindrome
-//            mTipAmountEdit.setEnabled(false);
-//            mTotalAmountEdit.setEnabled(false);
             disableView(mTipAmountEdit);
             disableView(mTotalAmountEdit);
         }
     }
 
+    /**
+     * Disables and edit text view.
+     * @param view view to disable
+     */
     private void disableView(View view){
         view.setEnabled(false);
         view.setFocusable(false);
     }
 
+    /**
+     * Enables an editText View for editing
+     * @param view View to enable
+     */
     private void enableView(View view){
         view.setEnabled(true);
         view.setFocusable(true);
     }
 
-    private void clearViewFocus(View rootView){
-        View focusChild = ((RelativeLayout)rootView.findViewById(R.id.calculator_layout)).getFocusedChild();
-        if (focusChild != null)
-            focusChild.clearFocus();
+    /**
+     * Clears the focus on any view that currently holds it. Used to remove focus from edit text fields when switching
+     * screens or using other controls.
+     */
+    private void clearViewFocus(){
+        RelativeLayout rootView = ((RelativeLayout)getActivity().findViewById(R.id.calculator_layout));
+        if(rootView != null) {
+            View focusChild = rootView.getFocusedChild();
+            if (focusChild != null)
+                focusChild.clearFocus();
+        }
     }
 
     /**
      *Resets edit text fields to default values.
      */
-    public void resetTextFields() {
+    private void resetTextFields() {
         mIgnoreTextChange = true;   //Ignore text field text change listeners when setting default values
+        clearViewFocus();
         String formattedZero = mDecimalFormat.format(0);
         mBillAmountEdit.setText(formattedZero);
         mTipPercentEdit.setText(DEFAULT_TIP);
@@ -270,7 +288,7 @@ public class CalculatorFragment extends Fragment {
     /**
      * Pulls current value of preferences, the default tip amount and the tip method.
      */
-    public void pullPreferenceValues(){
+    private void pullPreferenceValues(){
         SharedPreferences sPref = PreferenceManager.getDefaultSharedPreferences(getContext());
         DEFAULT_TIP = Integer.toString(sPref.getInt(getString(R.string.pref_tip_key), R.integer.pref_tip_default));
         if (!mOverrideTipMethod) {
@@ -286,12 +304,7 @@ public class CalculatorFragment extends Fragment {
      * Updates editText fields whenever a key is pressed to make sure all fields display proper value at all times.
      * @param caller The edit text that was modified
      */
-    public void updateFields(EditText caller){
-        //Set amounts to default -1, checks if field has been deleted
-//        double bill = BLANK_FIELD;
-//        double tip = BLANK_FIELD;
-//        double total = BLANK_FIELD;
-//        double people = BLANK_FIELD;
+    private void updateFields(EditText caller){
         //TODO make this better?
         double bill = 0;
         double tipPercent = 0;
@@ -365,12 +378,20 @@ public class CalculatorFragment extends Fragment {
         mIgnoreTextChange = false; //Enable the text change listeners again
     }
 
+    /**
+     * Updates tip amount using bill and tip percent.
+     * @return the tip amount
+     */
     private double updateTipAmount(double bill, double tipPercent){
         double tipAmount = bill * tipPercent;
         mTipAmountEdit.setText(mDecimalFormat.format(tipAmount));
         return tipAmount;
     }
 
+    /**
+     * Updates tip amount using bill and total.
+     * @return the tip amount
+     */
     private double updateTipAmountFromTotal(double bill, double total){
         double tipAmount = total - bill;
         mTipAmountEdit.setText(mDecimalFormat.format(tipAmount));
@@ -410,12 +431,21 @@ public class CalculatorFragment extends Fragment {
         return total;
     }
 
+    /**
+     * Updates each pays field using total and number of people.
+     * @return each pays value
+     */
+    //TODO round up so the total is met or exceeded not less than
     private double updateEachPays(double total, double people){
         double eachPays = total / people;
         mEachPaysEdit.setText(mDecimalFormat.format(eachPays));
         return eachPays;
     }
 
+    /**
+     * Updates tip percent using bill and tip amount.
+     * @return the tip percent
+     */
     private double updateTipPercent(double bill, double tipAmount){
         double tipPercent = calculateTipPercent(bill, tipAmount);
         String tip = Double.toString(tipPercent);
@@ -440,32 +470,10 @@ public class CalculatorFragment extends Fragment {
         return tipPercent;
     }
 
-
-
-
     /**
-     * Calculates the each pays field that denotes how much each person would have to pay to add up to the
-     * total.
-     * @param total the current value of total
-     * @param people the current number of people
-     * @return the value each pays
+     * Displays a dialog alert when the user attempts to open the check split section when not using
+     * normal tip calculation method.
      */
-    //TODO round up so the total is met or exceeded not less than
-    public double calculateEachPays(double total, double people){
-        return total/people;
-    }
-
-    /**
-     * Calculates the tip percentage field based on the currently selected tipping method.
-     * @param bill the current value of the bill
-     * @param total the current value of the total
-     * @return the new value of the tip percent
-     */
-    public double calculatePercent(double bill, double total){
-        return 0;
-    }
-
-
     private void showNormalTipAlertDialog(){
         AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
         dialog.setTitle("Check splitting is unavailable"); //TODO add these to strings xml
@@ -493,7 +501,6 @@ public class CalculatorFragment extends Fragment {
         });
 
         dialog.show();
-
     }
 
     /**
@@ -535,8 +542,6 @@ public class CalculatorFragment extends Fragment {
         });
 
         dialog.show();
-
-
     }
     /**
      * Text Change Listener that will listen for any key presses within the editText fields of the calculator.
@@ -544,7 +549,7 @@ public class CalculatorFragment extends Fragment {
      * @author Keegan Smith
      * @version 10/31/2015
      */
-    public class TextChangeListener implements TextWatcher{
+    private class TextChangeListener implements TextWatcher{
 
         CalculatorFragment fragment;
         EditText host;
@@ -578,7 +583,7 @@ public class CalculatorFragment extends Fragment {
      * This class handles storing the current values of the fields into the history database.
      * Used whenever the save transaction button is pressed.
      */
-    public class StoreTransactionTask extends AsyncTask<String, Void, Long>{
+    private class StoreTransactionTask extends AsyncTask<String, Void, Long>{
 
         double eachPaysBefore;
 
@@ -610,8 +615,6 @@ public class CalculatorFragment extends Fragment {
          */
         @Override
         protected Long doInBackground(String... params) {
-            if (db==null) //Instantiate db if not already done
-                db = HistoryDbHelper.getInstance(getContext()).getWritableDatabase();
 
             eachPaysBefore = Double.parseDouble(params[5]); //Save eachPaysBefore value for comparison once insert is complete
             //TODO need error checking
@@ -621,7 +624,7 @@ public class CalculatorFragment extends Fragment {
             values.put(HistoryEntry.COLUMN_BILL,params[1]);
             values.put(HistoryEntry.COLUMN_TIP_PERCENT,params[2]);
             values.put(HistoryEntry.COLUMN_TOTAL,params[3]);
-            values.put(HistoryEntry.COLUMN_PEOPLE,params[4]);
+            values.put(HistoryEntry.COLUMN_PEOPLE, params[4]);
             values.put(HistoryEntry.COLUMN_EACH_PAYS, params[5]);
 
             return db.insert(HistoryEntry.TABLE_NAME,null,values);
