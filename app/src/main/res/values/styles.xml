@@ -14,30 +14,30 @@
 
     <style name="defaultTextFormat">
         <item name="android:textStyle">bold</item>
-        <item name="android:textSize">18sp</item>
+        <item name="android:textSize">34sp</item>
     </style>
     <style name="historyEntryTextFormat">
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">22sp</item>
     </style>
     <style name="labelText" parent="@style/defaultTextFormat">
-        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_weight">1</item>
     </style>
     <style name="editField" parent="@style/defaultTextFormat">
-        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:imeOptions">actionDone</item>
         <item name="android:selectAllOnFocus">true</item>
-        <item name="android:ems">5</item>
-        <item name="android:layout_weight">1</item>
+        <item name="android:minEms">2</item>
+        <item name="android:background">@drawable/edit_text_border</item>
+        <item name="android:paddingLeft">10dp</item>
+        <item name="android:paddingRight">10dp</item>
     </style>
     <style name="labelFieldHolder">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:orientation">horizontal</item>
-        <item name="android:weightSum">2</item>
     </style>
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />

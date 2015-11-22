@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="fill_parent"
+    android:layout_width="fill_parent"
+    
+    >
+<RelativeLayout
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -8,176 +13,190 @@
     android:focusable="true"
     android:focusableInTouchMode="true">
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <RelativeLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:id="@+id/base_linear_layout">
-
-
-        <LinearLayout style="@style/labelFieldHolder">
+        android:id="@+id/base_calc_layout"
+        android:layout_marginTop="10dp"
+        android:layout_centerHorizontal="true">
 
             <TextView
                 android:id="@+id/bill_amount_label"
                 android:text="@string/bill_amount"
                 style="@style/labelText"
+                android:layout_alignRight="@+id/tip_percent_layout"
+                android:layout_alignBaseline="@+id/bill_amount_edit"
                 />
 
             <EditText
                 android:id="@+id/bill_amount_edit"
                 style="@style/editField"
                 android:inputType="numberDecimal"
+                android:layout_toRightOf="@id/bill_amount_label"
                 />
 
-
-        </LinearLayout>
-
-        <LinearLayout style="@style/labelFieldHolder">
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:layout_weight="1"
-                android:weightSum="6">
+            <RelativeLayout
+                android:id="@+id/tip_percent_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/bill_amount_edit"
+                >
 
                 <TextView
-                    android:id="@+id/tip_percent_label"
-                    android:text="@string/tip_amount"
-                    style="@style/defaultTextFormat"
-                    android:layout_height="wrap_content"
-                    android:layout_width="wrap_content"
-                    android:layout_weight="3"
-                    />
+                android:id="@+id/tip_percent_label"
+                android:text="@string/tip_amount"
+                style="@style/defaultTextFormat"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_alignRight="@+id/tip_edit_and_percent"
+                />
 
-                <EditText
-                    android:id="@+id/tip_percent_edit"
-                    style="@style/defaultTextFormat"
-                    android:layout_height="wrap_content"
-                    android:layout_width="0dp"
-                    android:layout_weight="2"
-                    android:ems="5"
-                    android:selectAllOnFocus="true"
-                    android:gravity="end"
-                    />
-
-                <TextView
+                <LinearLayout
+                    android:id="@+id/tip_edit_and_percent"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/percent_sign"
-                    android:id="@+id/percent_sign"
-                    style="@style/defaultTextFormat"
-                    android:layout_weight="1"/>
-            </LinearLayout>
+                    android:layout_below="@id/tip_percent_label"
+                    android:orientation="horizontal">
+
+                    <EditText
+                        android:id="@+id/tip_percent_edit"
+                        style="@style/defaultTextFormat"
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:minEms="1"
+                        android:selectAllOnFocus="true"
+                        android:gravity="end"
+                        android:background="@drawable/edit_text_border"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp"
+                        />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/percent_sign"
+                        android:id="@+id/percent_sign"
+                        style="@style/defaultTextFormat"
+
+                        />
+                </LinearLayout>
+
+
+            </RelativeLayout>
 
             <EditText
                 android:id="@+id/tip_amount_edit"
                 style="@style/editField"
                 android:inputType="numberDecimal"
-                />
-
-
-
-
-
-
-
-        </LinearLayout>
-
-        <LinearLayout style="@style/labelFieldHolder">
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@+id/bill_amount_label"
+                android:layout_toEndOf="@+id/bill_amount_label" />
 
             <TextView
                 android:id="@+id/total_amount_label"
                 android:text="@string/total_amount"
                 style="@style/labelText"
+                android:layout_below="@id/tip_percent_layout"
+                android:layout_alignBaseline="@+id/total_amount_edit"
+                android:layout_alignRight="@id/tip_percent_layout"
                 />
 
             <EditText
                 android:id="@+id/total_amount_edit"
                 style="@style/editField"
                 android:inputType="numberDecimal"
+                android:layout_below="@id/tip_percent_layout"
+                android:layout_toRightOf="@id/total_amount_label"
                 />
 
+    </RelativeLayout>
 
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/split_total"
-                style="@style/defaultTextFormat" />
-
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_add_circle_black_24dp"
-                android:id="@+id/split_toggle_button"
-                android:contentDescription="@string/toggle_content_description"
-                />
-        </LinearLayout>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
+    <RelativeLayout
+        android:id="@+id/split_button_layout"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_below="@id/base_linear_layout"
-        android:id="@+id/split_check_layout"
-        android:visibility="invisible">
+        android:layout_below="@id/base_calc_layout"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        >
 
-        <LinearLayout style="@style/labelFieldHolder">
+        <TextView
+            android:id="@+id/split_check_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/split_total"
+            style="@style/defaultTextFormat"
+            android:textSize="25sp"
+            android:layout_centerVertical="true" />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_add_circle_black_24dp"
+            android:id="@+id/split_toggle_button"
+            android:contentDescription="@string/toggle_content_description"
+            android:layout_toRightOf="@id/split_check_label"
+            />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/split_check_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/split_button_layout"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:visibility="invisible">
 
             <TextView
                 android:id="@+id/number_people_label"
                 android:text="@string/number_people"
                 style="@style/labelText"
+                android:textSize="25sp"
                 />
 
             <EditText
                 android:id="@+id/number_people_edit"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:selectAllOnFocus="true"
-                android:ems="5"
-                android:layout_weight="1"
                 style="@style/defaultTextFormat"
+                android:minEms="1"
+                android:background="@drawable/edit_text_border"
+                android:layout_toRightOf="@id/number_people_label"
+                android:textSize="25sp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:layout_marginBottom="5dp"
                 />
-
-
-        </LinearLayout>
-
-        <LinearLayout style="@style/labelFieldHolder">
 
             <TextView
                 android:id="@+id/each_pays_label"
                 android:text="@string/each_person_pays"
                 style="@style/labelText"
+                android:layout_below="@id/number_people_edit"
+                android:layout_alignRight="@id/number_people_label"
+                android:textSize="25sp"
                 />
 
             <EditText
                 android:id="@+id/each_pays_edit"
                 style="@style/editField"
+                android:layout_below="@id/number_people_edit"
+                android:layout_toRightOf="@id/each_pays_label"
+                android:textSize="25sp"
                 />
 
-        </LinearLayout>
+        </RelativeLayout>
 
-    </LinearLayout>
-
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/button_layout"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingTop="30dp"
         android:layout_below="@+id/split_check_layout"
-        android:gravity="center">
+        android:gravity="center_vertical"
+        android:layout_marginTop="20dp"
+        >
 
         <Button
             android:layout_width="wrap_content"
@@ -191,6 +210,7 @@
             android:layout_height="wrap_content"
             android:text="@string/clear_button"
             android:id="@+id/clear_button"
+            android:layout_toRightOf="@id/save_button"
             />
 
         <Button
@@ -198,9 +218,11 @@
             android:layout_height="wrap_content"
             android:text="*manage database*"
             android:id="@+id/delete_db"
+            android:layout_toRightOf="@id/clear_button"
             />
 
-    </LinearLayout>
+    </RelativeLayout>
 
 
 </RelativeLayout>
+</ScrollView>

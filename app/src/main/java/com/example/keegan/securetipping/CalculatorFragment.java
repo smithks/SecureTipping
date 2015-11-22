@@ -20,7 +20,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -51,7 +50,7 @@ public class CalculatorFragment extends Fragment {
     private String[] TIPPING_METHODS;
     private DecimalFormat mDecimalFormat = new DecimalFormat("#0.00");
 
-    private LinearLayout mSplitCheckLayout;
+    private RelativeLayout mSplitCheckLayout;
     private EditText mBillAmountEdit;
     private EditText mTipPercentEdit;
     private EditText mTipAmountEdit;
@@ -84,7 +83,7 @@ public class CalculatorFragment extends Fragment {
      * @param rootView the rootView for this fragment
      */
     private void initializeFields(final View rootView){
-        mSplitCheckLayout = (LinearLayout) rootView.findViewById(R.id.split_check_layout);
+        mSplitCheckLayout = (RelativeLayout) rootView.findViewById(R.id.split_check_layout);
 
         mBillAmountEdit = (EditText) rootView.findViewById(R.id.bill_amount_edit);
         mTipPercentEdit = (EditText) rootView.findViewById(R.id.tip_percent_edit);
