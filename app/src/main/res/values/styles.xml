@@ -14,7 +14,7 @@
 
     <style name="defaultTextFormat">
         <item name="android:textStyle">bold</item>
-        <item name="android:textSize">34sp</item>
+        <item name="android:textSize">30sp</item>
     </style>
     <style name="historyEntryTextFormat">
         <item name="android:textStyle">bold</item>
@@ -29,7 +29,7 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:imeOptions">actionDone</item>
         <item name="android:selectAllOnFocus">true</item>
-        <item name="android:minEms">2</item>
+        <item name="android:minEms">3</item>
         <item name="android:background">@drawable/edit_text_border</item>
         <item name="android:paddingLeft">10dp</item>
         <item name="android:paddingRight">10dp</item>

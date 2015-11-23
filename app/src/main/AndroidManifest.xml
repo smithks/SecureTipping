@@ -27,6 +27,7 @@
         <activity android:name=".DetailActivity"
             android:label="History Entry"
             android:parentActivityName=".MainActivity"
+            android:screenOrientation="portrait"
             />
         <activity android:name=".AndroidDatabaseManager"
             android:theme="@style/Theme.AppCompat.Light"/>

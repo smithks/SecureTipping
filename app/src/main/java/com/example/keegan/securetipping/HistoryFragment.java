@@ -96,7 +96,7 @@ public class HistoryFragment extends Fragment {
          * @param result
          */
         @Override
-        protected void onPostExecute(Cursor result){
+        protected void onPostExecute(final Cursor result){
             String[] fromColumns = new String[] {HistoryEntry.COLUMN_DATE,HistoryEntry.COLUMN_EACH_PAYS};
             int[] toViews = new int[]{R.id.date_layout,R.id.paid_textView};
             adapter = new SimpleCursorAdapter(getContext(),R.layout.history_listview_item,result,fromColumns,toViews,SimpleCursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
@@ -140,6 +140,7 @@ public class HistoryFragment extends Fragment {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     Intent intent = new Intent(getActivity(),DetailActivity.class);
+                    intent.putExtra("HISTORY_ENTRY_ITEM_ID",id);
                     startActivity(intent);
                 }
             });

@@ -27,6 +27,7 @@ import android.widget.Toast;
 import com.example.keegan.securetipping.data.HistoryContract.HistoryEntry;
 import com.example.keegan.securetipping.data.HistoryDbHelper;
 
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -49,6 +50,7 @@ public class CalculatorFragment extends Fragment {
     private String TIP_METHOD;
     private String[] TIPPING_METHODS;
     private DecimalFormat mDecimalFormat = new DecimalFormat("#0.00");
+
 
     private RelativeLayout mSplitCheckLayout;
     private EditText mBillAmountEdit;
@@ -107,6 +109,8 @@ public class CalculatorFragment extends Fragment {
         mTotalAmountEdit.addTextChangedListener(new TextChangeListener(this, mTotalAmountEdit));
         mNumberPeopleEdit.addTextChangedListener(new TextChangeListener(this, mNumberPeopleEdit));
         disableView(mEachPaysEdit); //Don't allow users to edit the each pays field
+
+        mDecimalFormat.setRoundingMode(RoundingMode.CEILING);
 
         mTipPercentEdit.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -420,9 +424,6 @@ public class CalculatorFragment extends Fragment {
                     }
                     total = Double.parseDouble(newTotal);
                 }
-                //TODO display actual tip?
-                double tip = calculateTipPercent(bill,(bill * tipPercent));
-                double difference = Math.abs(tipPercent - tip);
             }
         }
         updateEachPays(total, people);
