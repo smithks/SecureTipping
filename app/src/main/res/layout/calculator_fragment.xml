@@ -124,7 +124,10 @@
             android:src="@drawable/ic_add_circle_black_24dp"
             android:id="@+id/split_toggle_button"
             android:contentDescription="@string/toggle_content_description"
+            android:background="@android:color/transparent"
             android:layout_toRightOf="@id/split_check_label"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="5dp"
             />
     </RelativeLayout>
 
@@ -193,6 +196,7 @@
             android:layout_height="wrap_content"
             android:text="@string/save_button"
             android:id="@+id/save_button"
+            android:textStyle="bold"
             />
 
         <Button
@@ -201,6 +205,7 @@
             android:text="@string/clear_button"
             android:id="@+id/clear_button"
             android:layout_toRightOf="@id/save_button"
+            android:textStyle="bold"
             />
 
         <Button

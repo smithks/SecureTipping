@@ -46,6 +46,9 @@ public class DetailActivity extends AppCompatActivity{
         }
     }
 
+    /**
+     * Uses the passed in id for this entry to retreive all relevant values to populate detail fields.
+     */
     private class FetchHistoryEntry extends AsyncTask<Long, Void, Cursor>{
 
         @Override

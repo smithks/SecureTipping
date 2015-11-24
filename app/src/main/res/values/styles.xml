@@ -15,10 +15,11 @@
     <style name="defaultTextFormat">
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">30sp</item>
+        <item name="android:textColor">#000000</item>
     </style>
     <style name="historyEntryTextFormat">
-        <item name="android:textStyle">bold</item>
         <item name="android:textSize">22sp</item>
+        <item name="android:textColor">#000000</item>
     </style>
     <style name="labelText" parent="@style/defaultTextFormat">
         <item name="android:layout_width">wrap_content</item>

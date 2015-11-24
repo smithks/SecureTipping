@@ -1,6 +1,8 @@
 package com.example.keegan.securetipping;
 
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -12,9 +14,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.keegan.securetipping.data.HistoryContract.HistoryEntry;
 import com.example.keegan.securetipping.data.HistoryDbHelper;
@@ -33,8 +37,6 @@ public class HistoryFragment extends Fragment {
 
     private SimpleCursorAdapter adapter;
     private ListView listView;
-    private int DATE_COLUMN_INDEX = 1; //Keeps track of date column for viewbinder
-    private int PAID_COLUMN_INDEX = 2; //Keeps track of paid column for viewbinder
     private SimpleDateFormat dateFormat;
     private SimpleDateFormat timeFormat;
     private DecimalFormat decimalFormat;
@@ -97,8 +99,8 @@ public class HistoryFragment extends Fragment {
          */
         @Override
         protected void onPostExecute(final Cursor result){
-            String[] fromColumns = new String[] {HistoryEntry.COLUMN_DATE,HistoryEntry.COLUMN_EACH_PAYS};
-            int[] toViews = new int[]{R.id.date_layout,R.id.paid_textView};
+            String[] fromColumns = new String[] {HistoryEntry._ID, HistoryEntry.COLUMN_DATE, HistoryEntry.COLUMN_EACH_PAYS};
+            int[] toViews = new int[]{R.id.clear_button,R.id.date_layout,R.id.paid_textView};
             adapter = new SimpleCursorAdapter(getContext(),R.layout.history_listview_item,result,fromColumns,toViews,SimpleCursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
             //Set custom handling of views through viewBinder
             adapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
@@ -111,11 +113,11 @@ public class HistoryFragment extends Fragment {
                  * @return true if this method was used, false otherwise
                  */
                 @Override
-                public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
-                    if (columnIndex == DATE_COLUMN_INDEX){ //Format date using two text views
+                public boolean setViewValue(View view, final Cursor cursor, int columnIndex) {
+                    if (columnIndex == cursor.getColumnIndex(HistoryEntry.COLUMN_DATE)){ //Format date using two text views
                         TextView date = (TextView) view.findViewById(R.id.date_textView);
                         TextView time = (TextView) view.findViewById(R.id.time_textView);
-                        String dateAndTime = cursor.getString(DATE_COLUMN_INDEX);
+                        String dateAndTime = cursor.getString(cursor.getColumnIndex(HistoryEntry.COLUMN_DATE));
                         try {
                             Date fullDate = new Date(Long.parseLong(dateAndTime));
                             date.setText(dateFormat.format(fullDate));
@@ -125,11 +127,15 @@ public class HistoryFragment extends Fragment {
                             Log.e("Date format exception", e.getMessage());
                         }
                         return true;
-                    }else if (columnIndex == PAID_COLUMN_INDEX){ //Format paid total
+                    }else if (columnIndex == cursor.getColumnIndex(HistoryEntry.COLUMN_EACH_PAYS)){ //Format paid total
                         TextView paid = (TextView) view;
-                        String paidStr = cursor.getString(PAID_COLUMN_INDEX);
+                        String paidStr = cursor.getString(cursor.getColumnIndex(HistoryEntry.COLUMN_EACH_PAYS));
                         paidStr = "$"+decimalFormat.format(Double.parseDouble(paidStr));
                         paid.setText(paidStr);
+                        return true;
+                    }else if (columnIndex == cursor.getColumnIndex(HistoryEntry._ID)){
+                        ImageButton deleteButton = (ImageButton) view;
+                        deleteButton.setOnClickListener(new DeleteButtonListener(cursor.getString(cursor.getColumnIndex(HistoryEntry._ID))));
                         return true;
                     }
                     return false;
@@ -139,11 +145,67 @@ public class HistoryFragment extends Fragment {
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    Intent intent = new Intent(getActivity(),DetailActivity.class);
-                    intent.putExtra("HISTORY_ENTRY_ITEM_ID",id);
+                    Intent intent = new Intent(getActivity(), DetailActivity.class);
+                    intent.putExtra("HISTORY_ENTRY_ITEM_ID", id);
                     startActivity(intent);
                 }
             });
+        }
+
+    }
+
+    /**
+     * Click listener for delete buttons used in the list viewer.
+     */
+    private class DeleteButtonListener implements View.OnClickListener{
+
+        String mEntryID;
+
+        public DeleteButtonListener(String id){
+            mEntryID = id;
+        }
+        @Override
+
+        public void onClick(View v) {
+            final AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+            alert.setTitle(getResources().getString(R.string.alert_dialog_delete_title));
+            alert.setMessage(getResources().getString(R.string.alert_dialog_delete_message));
+            alert.setIcon(R.drawable.ic_warning_black_24dp);
+            alert.setPositiveButton(getResources().getString(R.string.alert_dialog_delete_positive), new DialogInterface.OnClickListener() {
+
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    new DeleteHistoryEntry().execute(mEntryID);
+                }
+            });
+            alert.setNegativeButton(getResources().getString(R.string.alert_dialog_delete_negative), new DialogInterface.OnClickListener() {
+
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            alert.show();
+        }
+    }
+
+    /**
+     * Async task that handles deleting an entry in the history table. Called
+     * by clicking the delete button from an item in the listView.
+     */
+    private class DeleteHistoryEntry extends AsyncTask<String, Void, Void>{
+
+        @Override
+        protected Void doInBackground(String... params) {
+            String where = "_id = " +params[0];
+            db.delete(HistoryEntry.TABLE_NAME,where,null);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result){
+            refreshHistory();
+            Toast.makeText(getContext(),getResources().getString(R.string.toast_delete_successful),Toast.LENGTH_SHORT).show();
         }
     }
 }

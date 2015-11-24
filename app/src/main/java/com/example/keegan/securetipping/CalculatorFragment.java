@@ -45,7 +45,6 @@ public class CalculatorFragment extends Fragment {
 
     private SQLiteDatabase db;
 
-    private static final String APPTAG = "Secure Tipping";
     private String DEFAULT_TIP;
     private String TIP_METHOD;
     private String[] TIPPING_METHODS;
@@ -476,10 +475,9 @@ public class CalculatorFragment extends Fragment {
      */
     private void showNormalTipAlertDialog(){
         AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
-        dialog.setTitle("Check splitting is unavailable"); //TODO add these to strings xml
-        dialog.setMessage("We cannot maintain the secure palindrome pattern for each persons check without altering the original total. To split the check, temporarily switch to " +
-                "normal calculation by pressing the corresponding button below or change your default calculation method in settings.");
-        dialog.setNeutralButton("Use normal calculation", new DialogInterface.OnClickListener() {
+        dialog.setTitle(getResources().getString(R.string.alert_dialog_toggle_title));
+        dialog.setMessage(getResources().getString(R.string.alert_dialog_toggle_message));
+        dialog.setNeutralButton(getResources().getString(R.string.alert_dialog_toggle_neutral), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 TIP_METHOD = TIPPING_METHODS[0]; //Set tipping method to normal for duration of this activity
@@ -493,7 +491,7 @@ public class CalculatorFragment extends Fragment {
             }
         });
 
-        dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+        dialog.setPositiveButton(getResources().getString(R.string.alert_dialog_toggle_positive), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
@@ -511,9 +509,9 @@ public class CalculatorFragment extends Fragment {
 
         final Dialog dialog = new Dialog(getContext());
         if (caller.getId() == mTipPercentEdit.getId())
-            dialog.setTitle("Tip percentage"); //TODO pull strings from strings xml
+            dialog.setTitle(getResources().getString(R.string.picker_dialog_percent_title));
         else
-            dialog.setTitle("Number of people");
+            dialog.setTitle(getResources().getString(R.string.picker_dialog_people_title));
         dialog.setContentView(R.layout.number_picker_dialog);
         final NumberPicker picker = (NumberPicker) dialog.findViewById(R.id.dialog_number_picker);
         Button okButton = (Button) dialog.findViewById(R.id.dialog_ok_button);
@@ -601,10 +599,10 @@ public class CalculatorFragment extends Fragment {
                         mSaveButton.setEnabled(false);
                     }
                 }
-                Toast.makeText(getContext(),R.string.toast_store_successful,Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(),getResources().getString(R.string.toast_store_successful),Toast.LENGTH_SHORT).show();
 
             }else{
-                Toast.makeText(getContext(),R.string.toast_store_failed,Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(),getResources().getString(R.string.toast_store_failed),Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -637,8 +635,6 @@ public class CalculatorFragment extends Fragment {
         public String getTimestamp(){
             Date date = Calendar.getInstance().getTime();
             return Long.toString(date.getTime());
-            //SimpleDateFormat dateFormat = (SimpleDateFormat) SimpleDateFormat.getDateTimeInstance();
-            //return dateFormat.format(date);
         }
 
 

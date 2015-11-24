@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="fill_parent"
+    android:layout_width="fill_parent">
+<LinearLayout
     android:id="@+id/entry_detail_layout"
     android:orientation="vertical"
     android:layout_width="match_parent"
@@ -65,6 +68,7 @@
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
                 android:textSize="50sp"
+                android:textColor="#000000"
                 android:text="$53.35"/>
         </LinearLayout>
 
@@ -202,3 +206,4 @@
 
     </LinearLayout>
 </LinearLayout>
+</ScrollView>
