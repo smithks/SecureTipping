@@ -14,14 +14,6 @@ import android.view.MenuItem;
 
 public class MainActivity extends AppCompatActivity {
 
-    /**
-     * The {@link android.support.v4.view.PagerAdapter} that will provide
-     * fragments for each of the sections. We use a
-     * {@link FragmentPagerAdapter} derivative, which will keep every
-     * loaded fragment in memory. If this becomes too memory intensive, it
-     * may be best to switch to a
-     * {@link android.support.v4.app.FragmentStatePagerAdapter}.
-     */
     private CalculatorPagerAdapter mSectionsPagerAdapter;
 
     /**
@@ -38,8 +30,7 @@ public class MainActivity extends AppCompatActivity {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        // Create the adapter that will return a fragment for each of the three
-        // primary sections of the activity.
+
         mSectionsPagerAdapter = new CalculatorPagerAdapter(getSupportFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
@@ -59,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPageSelected(int position) {
                 CalculatorPagerAdapter fragmentPagerAdapter = (CalculatorPagerAdapter) mViewPager.getAdapter();
-                if(position == HISTORY_PAGE_INDEX){
+                if(position == HISTORY_PAGE_INDEX){ //TODO bad bug due to what fragment being returned
                     ((HistoryFragment) fragmentPagerAdapter.getItem(HISTORY_PAGE_INDEX)).refreshHistory();
                 }else if(position == CALCULATOR_PAGE_INDEX){
                     //((CalculatorFragment) fragmentPagerAdapter.getItem(CALCULATOR_PAGE_INDEX)).refreshCalculator();
@@ -75,21 +66,11 @@ public class MainActivity extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
-        /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        })
+    }
 
-
-
-
-        ;
-        */
-
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
     }
 
 
@@ -102,9 +83,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
@@ -136,15 +115,12 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public Fragment getItem(int position) {
-            // getItem is called to instantiate the fragment for the given page.
-            // Return a PlaceholderFragment (defined as a static inner class below).
             if (position ==0) return calculatorFragment;
             else return historyFragment;
         }
 
         @Override
         public int getCount() {
-            // Show 3 total pages.
             return 2;
         }
 

@@ -33,7 +33,7 @@
     <string name="toggle_content_description">Add or remove check split section.</string>
     <string name="toast_store_successful">Transaction saved to history</string>
     <string name="toast_store_failed">Sorry! Something went wrong</string>
-    <string name="alert_dialog_toggle_title">Check splitting is unavailable</string>
+    <string name="alert_dialog_toggle_title">Use normal calculation to split check</string>
     <string name="alert_dialog_toggle_message">We cannot maintain the secure palindrome pattern for each persons check without altering the original total. To split the check, temporarily switch to
                 normal calculation by pressing the corresponding button below or change your default calculation method in settings.</string>
     <string name="alert_dialog_toggle_positive">OK</string>

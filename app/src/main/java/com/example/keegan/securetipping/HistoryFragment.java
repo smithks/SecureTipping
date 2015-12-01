@@ -2,6 +2,7 @@ package com.example.keegan.securetipping;
 
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -41,6 +42,7 @@ public class HistoryFragment extends Fragment {
     private SimpleDateFormat timeFormat;
     private DecimalFormat decimalFormat;
     private SQLiteDatabase db;
+    private Context mContext;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -51,22 +53,39 @@ public class HistoryFragment extends Fragment {
         dateFormat = (SimpleDateFormat)SimpleDateFormat.getDateInstance();  //TODO do not show year if current year?
         timeFormat = (SimpleDateFormat)SimpleDateFormat.getTimeInstance(DateFormat.SHORT);
         decimalFormat = new DecimalFormat("#0.00");
-
         refreshHistory();
         return rootView;
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        if (db==null){
+            db = HistoryDbHelper.getInstance(getContext()).getReadableDatabase();
+        }
+    }
+
+    @Override
+    public void onAttach(Context context){
+        super.onAttach(context);
+        mContext = context;
     }
 
     @Override
     public void onDestroy(){
         super.onDestroy();
         db.close();
+        mContext = null;
     }
 
     /**
      * Refreshes the listView in the history fragment with data from the history database.
      */
     public void refreshHistory(){
-        new FetchHistoryEntries().execute();
+        if (db==null){
+            db = HistoryDbHelper.getInstance(getContext()).getReadableDatabase();
+        }
+        new FetchHistoryEntries(getActivity()).execute();
     }
 
     /**
@@ -85,6 +104,12 @@ public class HistoryFragment extends Fragment {
      */
     private class FetchHistoryEntries extends AsyncTask<Void,Void,Cursor>{
 
+        Context context;
+
+        public FetchHistoryEntries(Context context){
+            this.context = context;
+        }
+
         @Override
         protected Cursor doInBackground(Void... params) {
             //TODO modify query to get restricted results, drop boxes for date range/price/etc.. send as params to asynctask
@@ -99,9 +124,11 @@ public class HistoryFragment extends Fragment {
          */
         @Override
         protected void onPostExecute(final Cursor result){
+            //if (result == null || context == null)
+                //return;
             String[] fromColumns = new String[] {HistoryEntry._ID, HistoryEntry.COLUMN_DATE, HistoryEntry.COLUMN_EACH_PAYS};
             int[] toViews = new int[]{R.id.clear_button,R.id.date_layout,R.id.paid_textView};
-            adapter = new SimpleCursorAdapter(getContext(),R.layout.history_listview_item,result,fromColumns,toViews,SimpleCursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
+            adapter = new SimpleCursorAdapter(context,R.layout.history_listview_item,result,fromColumns,toViews,SimpleCursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
             //Set custom handling of views through viewBinder
             adapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
 
@@ -207,5 +234,7 @@ public class HistoryFragment extends Fragment {
             refreshHistory();
             Toast.makeText(getContext(),getResources().getString(R.string.toast_delete_successful),Toast.LENGTH_SHORT).show();
         }
+
+
     }
 }

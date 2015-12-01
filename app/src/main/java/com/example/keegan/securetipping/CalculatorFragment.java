@@ -7,6 +7,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -96,6 +98,10 @@ public class CalculatorFragment extends Fragment {
         mToggleSplitButton = (ImageButton) rootView.findViewById(R.id.split_toggle_button);
         mClearButton = (Button) rootView.findViewById(R.id.clear_button);
         mSaveButton = (Button) rootView.findViewById(R.id.save_button);
+        mSaveButton.getBackground().setColorFilter(Color.parseColor("#F6511D"), PorterDuff.Mode.MULTIPLY);
+        mClearButton.getBackground().setColorFilter(Color.parseColor("#F6511D"), PorterDuff.Mode.MULTIPLY);
+        mSaveButton.setTextColor(Color.WHITE);
+        mClearButton.setTextColor(Color.WHITE);
 
         mSplitCheckDisplayed = false;
         TIPPING_METHODS = getResources().getStringArray(R.array.tipping_method_array_vaues);
@@ -203,7 +209,6 @@ public class CalculatorFragment extends Fragment {
             mToggleSplitButton.setImageResource(R.drawable.ic_add_circle_black_24dp);
             mSplitCheckDisplayed = false;
         }
-
         refreshCalculator();
     }
 
@@ -219,6 +224,7 @@ public class CalculatorFragment extends Fragment {
     public void refreshCalculator(){
         pullPreferenceValues();
         resetTextFields();
+        //TODO reset fields if calculaton method changed
         if (mMethodChanged) {
             updateFieldProperties();
             mMethodChanged = false;
@@ -245,7 +251,6 @@ public class CalculatorFragment extends Fragment {
      */
     private void disableView(View view){
         view.setEnabled(false);
-        view.setFocusable(false);
     }
 
     /**
@@ -254,7 +259,24 @@ public class CalculatorFragment extends Fragment {
      */
     private void enableView(View view){
         view.setEnabled(true);
-        view.setFocusable(true);
+    }
+
+    /**
+     * Disables a button
+     * @param b button to disable
+     */
+    private void disableButton(Button b){
+        b.setAlpha(.5f); //Make button transparent to display disabled status
+        b.setEnabled(false);
+    }
+
+    /**
+     * Enables a button
+     * @param b button to enable
+     */
+    private void enableButton(Button b){
+        b.setAlpha(1f); //Make button opaque
+        b.setEnabled(true);
     }
 
     /**
@@ -283,7 +305,8 @@ public class CalculatorFragment extends Fragment {
         mTotalAmountEdit.setText(formattedZero);
         mNumberPeopleEdit.setText("1");
         mEachPaysEdit.setText(formattedZero);
-        mSaveButton.setEnabled(false);
+        //mSaveButton.setEnabled(false);
+        disableButton(mSaveButton);
         mIgnoreTextChange = false;
     }
 
@@ -373,9 +396,11 @@ public class CalculatorFragment extends Fragment {
 
         //TODO change this to each pays, whatever is being stored into database
         if(total > 0)
-            mSaveButton.setEnabled(true);
+            //mSaveButton.setEnabled(true);
+            enableButton(mSaveButton);
         else
-            mSaveButton.setEnabled(false);
+            //mSaveButton.setEnabled(false);
+            disableButton(mSaveButton);
 
         mIgnoreTextChange = false; //Enable the text change listeners again
     }
@@ -386,6 +411,8 @@ public class CalculatorFragment extends Fragment {
      */
     private double updateTipAmount(double bill, double tipPercent){
         double tipAmount = bill * tipPercent;
+        if (tipAmount < 0) //Do not display negative tip amounts
+            tipAmount = 0;
         mTipAmountEdit.setText(mDecimalFormat.format(tipAmount));
         return tipAmount;
     }
@@ -396,6 +423,8 @@ public class CalculatorFragment extends Fragment {
      */
     private double updateTipAmountFromTotal(double bill, double total){
         double tipAmount = total - bill;
+        if (tipAmount < 0) //Do not display negative tipAmounts
+            tipAmount = 0;
         mTipAmountEdit.setText(mDecimalFormat.format(tipAmount));
         return tipAmount;
     }
@@ -443,30 +472,22 @@ public class CalculatorFragment extends Fragment {
 
     /**
      * Updates tip percent using bill and tip amount.
-     * @return the tip percent
+     * @return the tip percent as decimal (25% = .25)
      */
     private double updateTipPercent(double bill, double tipAmount){
-        double tipPercent = calculateTipPercent(bill, tipAmount);
-        String tip = Double.toString(tipPercent);
-        mTipPercentEdit.setText(tip);
-        return tipPercent;
-    }
-
-    /**
-     * Calculates the tip percent using the bill and the tipAmount
-     * @return tipPercent as a decimal (25% == .25)
-     */
-    private double calculateTipPercent(double bill, double tipAmount){
         double tipPercent = 0;
         if (bill > 0) //Don't divide by zero
             tipPercent= tipAmount / bill;
         double tipPercentRead = tipPercent * 100;
         String tip = Double.toString(tipPercentRead);
+        if (tipPercentRead < 0) //Display 0 if negative tip
+            tip = "0";
         if (tip.contains(".")) {
             int index = tip.indexOf(".");
-            tip = tip.substring(0, index);
+            tip = tip.substring(0, index); //Display value concatenated at decimal
         }
-        return tipPercent;
+        mTipPercentEdit.setText(tip);
+        return tipPercent; //Return original value of tip before concatenation
     }
 
     /**
@@ -596,7 +617,8 @@ public class CalculatorFragment extends Fragment {
                 //Race condition depending on how long insert took, before disabling button check if each pays has changed
                 if (mEachPaysEdit.getText().length() > 0){
                     if(eachPaysBefore == Double.parseDouble(mEachPaysEdit.getText().toString())){ //No change, no race condition, disable button so same data cannot be saved
-                        mSaveButton.setEnabled(false);
+                        //mSaveButton.setEnabled(false);
+                        disableButton(mSaveButton);
                     }
                 }
                 Toast.makeText(getContext(),getResources().getString(R.string.toast_store_successful),Toast.LENGTH_SHORT).show();
