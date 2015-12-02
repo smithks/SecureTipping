@@ -10,6 +10,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -50,7 +51,7 @@ public class HistoryFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.history_fragment, container, false);
         db = HistoryDbHelper.getInstance(getContext()).getReadableDatabase();
         listView = (ListView)rootView.findViewById(R.id.history_listview);
-        dateFormat = (SimpleDateFormat)SimpleDateFormat.getDateInstance();  //TODO do not show year if current year?
+        dateFormat = (SimpleDateFormat)SimpleDateFormat.getDateInstance();
         timeFormat = (SimpleDateFormat)SimpleDateFormat.getTimeInstance(DateFormat.SHORT);
         decimalFormat = new DecimalFormat("#0.00");
         refreshHistory();
@@ -112,7 +113,6 @@ public class HistoryFragment extends Fragment {
 
         @Override
         protected Cursor doInBackground(Void... params) {
-            //TODO modify query to get restricted results, drop boxes for date range/price/etc.. send as params to asynctask
             String[] column = new String[] {HistoryEntry._ID,HistoryEntry.COLUMN_DATE,HistoryEntry.COLUMN_EACH_PAYS};
             String orderBy = HistoryEntry.COLUMN_DATE +" DESC";
             return db.query(HistoryEntry.TABLE_NAME,column,null,null,null,null,orderBy,null);
@@ -147,7 +147,10 @@ public class HistoryFragment extends Fragment {
                         String dateAndTime = cursor.getString(cursor.getColumnIndex(HistoryEntry.COLUMN_DATE));
                         try {
                             Date fullDate = new Date(Long.parseLong(dateAndTime));
-                            date.setText(dateFormat.format(fullDate));
+                            if (DateUtils.isToday(Long.parseLong(dateAndTime)))
+                                date.setText(getResources().getString(R.string.date_item_today));
+                            else
+                                date.setText(dateFormat.format(fullDate));
                             time.setText(timeFormat.format(fullDate));
 
                         } catch (Exception e){

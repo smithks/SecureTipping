@@ -34,10 +34,7 @@ import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.Date;
 //TODO edit button appearance, make purple color?
-//TODO fix database leaking, close on pause and such
 //TODO include about page describing each method, indicate why methods may not be the best for lower/larger amounts (large descrepancy in tip percent vs actual tip percent)
-//TODO make interface nice, make total larger.
-//TODO improve history section, make searchable? Pop up item on click, show detailed view. Allow delete.
 /**
  * Calculator fragment displayed within viewpager.
  * @author Keegan Smith
@@ -223,9 +220,8 @@ public class CalculatorFragment extends Fragment {
      */
     public void refreshCalculator(){
         pullPreferenceValues();
-        resetTextFields();
-        //TODO reset fields if calculaton method changed
         if (mMethodChanged) {
+            resetTextFields();
             updateFieldProperties();
             mMethodChanged = false;
         }
@@ -305,7 +301,6 @@ public class CalculatorFragment extends Fragment {
         mTotalAmountEdit.setText(formattedZero);
         mNumberPeopleEdit.setText("1");
         mEachPaysEdit.setText(formattedZero);
-        //mSaveButton.setEnabled(false);
         disableButton(mSaveButton);
         mIgnoreTextChange = false;
     }
@@ -330,7 +325,6 @@ public class CalculatorFragment extends Fragment {
      * @param caller The edit text that was modified
      */
     private void updateFields(EditText caller){
-        //TODO make this better?
         double bill = 0;
         double tipPercent = 0;
         double tipAmount = 0;
@@ -349,13 +343,7 @@ public class CalculatorFragment extends Fragment {
         }
         if (mTipPercentEdit.getText().length() > 0 ){
             String tipRaw = mTipPercentEdit.getText().toString();
-            if (tipRaw.length() == 1) //TODO Convert tip amount to percent. Could use work. only works on whole numbers
-                tipRaw = ".0"+tipRaw;
-            else if (tipRaw.length() == 2) //10-99 percent
-                tipRaw = "."+tipRaw;
-            else if(tipRaw.length() == 3) //100 percent
-                tipRaw = "1";
-            tipPercent = Double.parseDouble(tipRaw);
+            tipPercent = Double.parseDouble(tipRaw)/100;
         }
         if (mTipAmountEdit.getText().length() > 0){
             valStr = mTipAmountEdit.getText().toString();
@@ -394,12 +382,9 @@ public class CalculatorFragment extends Fragment {
             eachPays = updateEachPays(total, people);
         }
 
-        //TODO change this to each pays, whatever is being stored into database
-        if(total > 0)
-            //mSaveButton.setEnabled(true);
+        if(eachPays > 0)
             enableButton(mSaveButton);
         else
-            //mSaveButton.setEnabled(false);
             disableButton(mSaveButton);
 
         mIgnoreTextChange = false; //Enable the text change listeners again
@@ -440,17 +425,14 @@ public class CalculatorFragment extends Fragment {
         double total = bill + (bill * tipPercent);;
         if(TIP_METHOD.equals(TIPPING_METHODS[1])) {//palindrome
             if(total > 0) {
-                String mirrorAmount = Double.toString(total).split("\\.")[0];
-                String newTotal = mirrorAmount;
-                if(Integer.parseInt(mirrorAmount)>0){ //Don't mirror a dollar value of 0
-                    char[] chars = mirrorAmount.toCharArray();
-                    //TODO this may be too hacky
-                    if (chars.length == 1){
-                        newTotal = newTotal+"."+chars[0];
-                    }else{
-                        newTotal = newTotal+"."+chars[chars.length-1]+chars[chars.length-2];
+                String choppedValue = Double.toString(total).split("\\.")[0]; //Cuts off amount following decimal (24.90 becomes 24)
+                if(Integer.parseInt(choppedValue)>0){ //Don't mirror a dollar value of 0
+                    double newTotal = mirrorAmount(choppedValue);
+                    if (newTotal < bill){ //In the case where new total is smaller than the original bill ($2.5 bill + .20 tip = $2.20 total)
+                        choppedValue = Double.toString(total+1).split("\\.")[0]; //Cuts off amount following decimal (24.90 becomes 24)
+                        newTotal = mirrorAmount(choppedValue);
                     }
-                    total = Double.parseDouble(newTotal);
+                    total = newTotal;
                 }
             }
         }
@@ -459,11 +441,21 @@ public class CalculatorFragment extends Fragment {
         return total;
     }
 
+    private double mirrorAmount(String amount){
+        String newTotalStr = amount;
+        char[] chars = amount.toCharArray();
+        if (chars.length == 1){
+            newTotalStr = newTotalStr+"."+chars[0];
+        }else{
+            newTotalStr = newTotalStr+"."+chars[chars.length-1]+chars[chars.length-2];
+        }
+        return Double.parseDouble(newTotalStr);
+    }
+
     /**
      * Updates each pays field using total and number of people.
      * @return each pays value
      */
-    //TODO round up so the total is met or exceeded not less than
     private double updateEachPays(double total, double people){
         double eachPays = total / people;
         mEachPaysEdit.setText(mDecimalFormat.format(eachPays));
@@ -503,7 +495,7 @@ public class CalculatorFragment extends Fragment {
             public void onClick(DialogInterface dialog, int which) {
                 TIP_METHOD = TIPPING_METHODS[0]; //Set tipping method to normal for duration of this activity
                 mOverrideTipMethod = true;
-                updateFields(mBillAmountEdit); //Recalculate fields
+                updateFields(mBillAmountEdit); //Recalculate fields based on bill amount
                 updateFieldProperties();
                 mSplitCheckLayout.setVisibility(View.VISIBLE);
                 mToggleSplitButton.setImageResource(R.drawable.ic_remove_circle_black_24dp);
@@ -539,7 +531,6 @@ public class CalculatorFragment extends Fragment {
         Button cancelButton = (Button) dialog.findViewById(R.id.dialog_cancel_button);
 
         picker.setMaxValue(100);
-        //TODO BUG: open app, insert value for tip amount, touch tip percent, crash
         picker.setMinValue(caller.getId() == mTipPercentEdit.getId() ? 0 : 1);
         picker.setValue(Integer.parseInt(caller.getText().toString()));
         picker.setWrapSelectorWheel(false);
@@ -637,7 +628,6 @@ public class CalculatorFragment extends Fragment {
         protected Long doInBackground(String... params) {
 
             eachPaysBefore = Double.parseDouble(params[5]); //Save eachPaysBefore value for comparison once insert is complete
-            //TODO need error checking
             ContentValues values = new ContentValues();
             values.put(HistoryEntry.COLUMN_DATE,getTimestamp());
             values.put(HistoryEntry.COLUMN_METHOD,params[0]);

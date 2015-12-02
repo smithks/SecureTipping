@@ -104,7 +104,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/base_calc_layout"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         >
 
         <TextView

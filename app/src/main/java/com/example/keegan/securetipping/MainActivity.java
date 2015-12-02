@@ -5,13 +5,21 @@ import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 
+/**
+ * Parent activity that contains viewpager for the secure tipping app. View pager contains two
+ * fragments, the calculator and a history fragment.
+ * @author Keegan Smith
+ * @since 12/1/2015
+ */
 public class MainActivity extends AppCompatActivity {
 
     private CalculatorPagerAdapter mSectionsPagerAdapter;
@@ -39,28 +47,22 @@ public class MainActivity extends AppCompatActivity {
 
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
 
             /**
              * Refreshes the listView in the history fragment whenever the user moves to it.
-             * @param position
+             * @param position page index moving to
              */
             @Override
             public void onPageSelected(int position) {
                 CalculatorPagerAdapter fragmentPagerAdapter = (CalculatorPagerAdapter) mViewPager.getAdapter();
-                if(position == HISTORY_PAGE_INDEX){ //TODO bad bug due to what fragment being returned
-                    ((HistoryFragment) fragmentPagerAdapter.getItem(HISTORY_PAGE_INDEX)).refreshHistory();
-                }else if(position == CALCULATOR_PAGE_INDEX){
-                    //((CalculatorFragment) fragmentPagerAdapter.getItem(CALCULATOR_PAGE_INDEX)).refreshCalculator();
-                }
+                if(position == HISTORY_PAGE_INDEX)
+                    ((HistoryFragment)fragmentPagerAdapter.getRegisteredFragment(position)).refreshHistory();
+
             }
 
             @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
+            public void onPageScrollStateChanged(int state) {}
         });
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
@@ -98,25 +100,21 @@ public class MainActivity extends AppCompatActivity {
 
 
     /**
-     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
-     * one of the sections/tabs/pages.
+     * FragmentStatePagerAdapter that returns a fragment corresponding to
+     * one of the tabs.
      */
-    public class CalculatorPagerAdapter extends FragmentPagerAdapter {
+    public class CalculatorPagerAdapter extends FragmentStatePagerAdapter {
 
-        HistoryFragment historyFragment;
-        CalculatorFragment calculatorFragment;
+        private SparseArray<Fragment> registeredFragments = new SparseArray<Fragment>(); //SparseArray holding fragments
 
         public CalculatorPagerAdapter(FragmentManager fm) {
             super(fm);
-            historyFragment = new HistoryFragment();
-            calculatorFragment = new CalculatorFragment();
         }
-
 
         @Override
         public Fragment getItem(int position) {
-            if (position ==0) return calculatorFragment;
-            else return historyFragment;
+            if (position ==0) return new CalculatorFragment();
+            else return new HistoryFragment();
         }
 
         @Override
@@ -133,6 +131,27 @@ public class MainActivity extends AppCompatActivity {
                     return "History";
             }
             return null;
+        }
+
+        @Override
+        public Object instantiateItem(ViewGroup container, int position){
+            Fragment fragment = (Fragment) super.instantiateItem(container, position);
+            registeredFragments.put(position,fragment);
+            return fragment;
+        }
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object){
+            registeredFragments.remove(position);
+            super.destroyItem(container, position, object);
+        }
+
+        /**
+         * For use in viewpager to get a fragment from the adapter.
+         * @param position position to return
+         * @return the requested fragment
+         */
+        public Fragment getRegisteredFragment(int position){
+            return registeredFragments.get(position);
         }
     }
 }

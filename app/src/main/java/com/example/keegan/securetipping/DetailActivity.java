@@ -35,7 +35,7 @@ public class DetailActivity extends AppCompatActivity{
 
         mDb = HistoryDbHelper.getInstance(this).getWritableDatabase();
         mParentLayout = findViewById(R.id.entry_detail_layout);
-        mDateFormat = (SimpleDateFormat)SimpleDateFormat.getDateInstance();  //TODO do not show year if current year?
+        mDateFormat = (SimpleDateFormat)SimpleDateFormat.getDateInstance();
         mTimeFormat = (SimpleDateFormat)SimpleDateFormat.getTimeInstance(DateFormat.SHORT);
         mDecimalFormat = new DecimalFormat("#0.00");
 

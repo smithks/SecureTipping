@@ -51,8 +51,6 @@ public class HistoryDbHelper extends SQLiteOpenHelper {
 
     }
 
-
-    //TODO support upgrading table, do not just drop all existing data, thats no good
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS "+ HistoryEntry.TABLE_NAME);
