@@ -40,6 +40,7 @@
     <string name="alert_dialog_toggle_neutral">Use normal calculation</string>
     <string name="picker_dialog_percent_title">Tip percentage</string>
     <string name="picker_dialog_people_title">Number of people</string>
+    <string name="rounding_warning">*Actual tip percentage used to reach pattern: %1$s%%</string>
 
     <!-- Detail activity -->
     <string name="detail_date">"Transaction date:   "</string>
@@ -61,5 +62,38 @@
     <string name="alert_dialog_delete_negative">Cancel</string>
     <string name="date_item_today">Today</string>
 
+    <!-- About activity -->
+    <string name="about_menu_action">About Palindrome Tipping</string>
+    <string name="example_content_description">Example of palindrome tipping</string>
+    <string name="about_body">In short, palindrome tipping is the secure way to tip.
+        \n\n
+        When you pay for a meal
+        using a credit card, there is an opportunity for anyone handling your receipt to commit fraud and modify your written tip
+        and total amounts. The only way to combat this is to keep a receipt and then compare the charge once it posts to your account.
+        \n\n
+        Palindrome tipping offers a calculation method that will make noticing these fraudulent charges very easy.
+        \n\n
+        We calculate your total normally using your preferred tipping percentage and then apply the palindrome pattern. The pattern is simply
+        mirroring the numbers in the ones and tens place and setting that mirrored amount on the right side of the decimal.
 
+    </string>
+    <string name="about_body2">The power of palindrome tipping lies in creating a pattern for your total that you will be able to instantly recognize when scanning
+        your credit card statement.
+        \n\n
+        If you notice a charge to your credit card from a restaurant and it does not follow the palindrome pattern then you know
+        that your intended total was altered.
+    </string>
+
+    <string name="limitations_header">Limitations</string>
+
+    <string name="about_limitations">Due to each whole dollar value corresponding to a single palindrome pattern  ($3.00 = $3.30, $10.00 = $10.01, $134.00 = $134.43, etc..), at low
+        amounts (usually less than $10), you can run into large amounts of rounding to reach a palindrome pattern that is greater than the original bill.
+        \n\n
+        Bill: $1.15 \n
+        Tip at 17 percent: $0.20 \n
+        Total: $1.35 \n
+        \nTo make this total follow the palindrome pattern we would need to round the total up to $2.20 since rounding down to $1.10 would be less than the original bill.
+        Rounding to a total of $2.20 would mean a 91 percent tip of $1.05! \n\n A warning message is displayed if the actual tip percentage is
+        30 percent greater than your requested percentage and we recommend switching to normal tip calculations for these low values.
+    </string>
 </resources>

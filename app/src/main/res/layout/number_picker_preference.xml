@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     >
     <NumberPicker
-
         android:id="@+id/percent_number_picker"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"

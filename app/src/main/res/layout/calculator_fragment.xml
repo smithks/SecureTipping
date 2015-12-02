@@ -98,11 +98,20 @@
 
     </RelativeLayout>
 
+    <TextView
+        android:id="@+id/rounding_warning_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/base_calc_layout"
+        android:text="@string/rounding_warning"
+        android:layout_centerHorizontal="true"
+        android:visibility="invisible"/>
+
     <RelativeLayout
         android:id="@+id/split_button_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/base_calc_layout"
+        android:layout_below="@id/rounding_warning_text"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp"
         >

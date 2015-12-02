@@ -93,11 +93,14 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
             return true;
+        } else if( id == R.id.action_about){
+            Intent intent = new Intent(this, AboutActivity.class);
+            startActivity(intent);
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
-
 
     /**
      * FragmentStatePagerAdapter that returns a fragment corresponding to

@@ -61,12 +61,10 @@ public class DetailActivity extends AppCompatActivity{
         @Override
         protected void onPostExecute(final Cursor result){
             if(result.moveToFirst()){
-
                 String dateAndTime = result.getString(result.getColumnIndex(HistoryEntry.COLUMN_DATE));
                 Date fullDate = new Date(Long.parseLong(dateAndTime));
                 String date = mDateFormat.format(fullDate);
                 String time = mTimeFormat.format(fullDate);
-
 
                 String paid = "$" + mDecimalFormat.format(Double.parseDouble(result.getString(result.getColumnIndex(HistoryEntry.COLUMN_EACH_PAYS))));
 

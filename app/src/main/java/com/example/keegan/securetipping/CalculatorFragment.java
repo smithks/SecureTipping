@@ -24,6 +24,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.NumberPicker;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.keegan.securetipping.data.HistoryContract.HistoryEntry;
@@ -49,12 +50,12 @@ public class CalculatorFragment extends Fragment {
     private String[] TIPPING_METHODS;
     private DecimalFormat mDecimalFormat = new DecimalFormat("#0.00");
 
-
     private RelativeLayout mSplitCheckLayout;
     private EditText mBillAmountEdit;
     private EditText mTipPercentEdit;
     private EditText mTipAmountEdit;
     private EditText mTotalAmountEdit;
+    private TextView mPercentWarningText;
     private EditText mNumberPeopleEdit;
     private EditText mEachPaysEdit;
     private ImageButton mToggleSplitButton;
@@ -91,6 +92,8 @@ public class CalculatorFragment extends Fragment {
         mTotalAmountEdit = (EditText) rootView.findViewById(R.id.total_amount_edit);
         mNumberPeopleEdit = (EditText) rootView.findViewById(R.id.number_people_edit);
         mEachPaysEdit = (EditText) rootView.findViewById(R.id.each_pays_edit);
+
+        mPercentWarningText = (TextView) rootView.findViewById(R.id.rounding_warning_text);
 
         mToggleSplitButton = (ImageButton) rootView.findViewById(R.id.split_toggle_button);
         mClearButton = (Button) rootView.findViewById(R.id.clear_button);
@@ -148,8 +151,6 @@ public class CalculatorFragment extends Fragment {
             }
         });
 
-        //EditorInfo.ACTION
-
         //Zero out fields on click
         mClearButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -192,7 +193,6 @@ public class CalculatorFragment extends Fragment {
         resetTextFields(); //Set fields to default values
         updateFieldProperties();
     }
-
 
     /**
      * Resets calculator and pulls preference values.
@@ -333,6 +333,7 @@ public class CalculatorFragment extends Fragment {
         double eachPays = 0;
 
         mIgnoreTextChange = true; //Disable text change listeners while updating programmatically.
+        mPercentWarningText.setVisibility(View.INVISIBLE);
 
         String valStr;
         //Collect current values stored in fields
@@ -433,6 +434,13 @@ public class CalculatorFragment extends Fragment {
                         newTotal = mirrorAmount(choppedValue);
                     }
                     total = newTotal;
+
+                    double newTipPercentage = (total - bill) / bill;
+                    if (Math.abs(newTipPercentage - tipPercent)>.30){ //If the difference is over 50 percent
+                        String newTipStr = getTipPercentString(newTipPercentage*100);
+                        mPercentWarningText.setText(getResources().getString(R.string.rounding_warning,newTipStr));
+                        mPercentWarningText.setVisibility(View.VISIBLE);
+                    }
                 }
             }
         }
@@ -471,6 +479,17 @@ public class CalculatorFragment extends Fragment {
         if (bill > 0) //Don't divide by zero
             tipPercent= tipAmount / bill;
         double tipPercentRead = tipPercent * 100;
+        mTipPercentEdit.setText(getTipPercentString(tipPercentRead));
+        return tipPercent; //Return original value of tip before concatenation
+    }
+
+    /**
+     * Returns string representation of tip percentage. Trims off any
+     * decimal values.
+     * @param tipPercentRead the tip percentage (25.02% = 25.02)
+     * @return The tip with trailing decimals trimmed off
+     */
+    private String getTipPercentString(double tipPercentRead){
         String tip = Double.toString(tipPercentRead);
         if (tipPercentRead < 0) //Display 0 if negative tip
             tip = "0";
@@ -478,8 +497,7 @@ public class CalculatorFragment extends Fragment {
             int index = tip.indexOf(".");
             tip = tip.substring(0, index); //Display value concatenated at decimal
         }
-        mTipPercentEdit.setText(tip);
-        return tipPercent; //Return original value of tip before concatenation
+        return tip;
     }
 
     /**
@@ -570,9 +588,7 @@ public class CalculatorFragment extends Fragment {
         }
 
         @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-        }
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
         /**
          * Update all fields every time any field is modified.
@@ -584,9 +600,7 @@ public class CalculatorFragment extends Fragment {
         }
 
         @Override
-        public void afterTextChanged(Editable s) {
-
-        }
+        public void afterTextChanged(Editable s) {}
     }
 
     /**
@@ -648,7 +662,5 @@ public class CalculatorFragment extends Fragment {
             Date date = Calendar.getInstance().getTime();
             return Long.toString(date.getTime());
         }
-
-
     }
 }

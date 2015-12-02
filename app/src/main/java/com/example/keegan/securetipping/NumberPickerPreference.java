@@ -57,8 +57,6 @@ public class NumberPickerPreference extends DialogPreference {
     @Override
     protected void onSetInitialValue(boolean restorePersistedValue, Object defaultValue){
         mCurrValue = restorePersistedValue ? getPersistedInt(R.integer.pref_tip_default) : (int) defaultValue;
-
-
     }
 
     /**

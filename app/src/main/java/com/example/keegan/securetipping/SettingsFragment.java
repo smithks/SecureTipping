@@ -7,6 +7,7 @@ import android.preference.Preference;
 import android.preference.PreferenceFragment;
 
 /**
+ * Settings fragment used to display preference summary below preference.
  * Created by Keegan on 11/12/2015.
  */
 public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -19,7 +20,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         addPreferencesFromResource(R.xml.pref_tipping);
         sPref = getPreferenceScreen().getSharedPreferences();
         sPref.registerOnSharedPreferenceChangeListener(this);
-
     }
 
     @Override
@@ -37,6 +37,11 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         updatePreference(pref);
     }
 
+    /**
+     * Sets the summary line to the current value of the preference.
+     * Called when preference value changes.
+     * @param preference preference changed
+     */
     public void updatePreference(Preference preference){
         if (preference instanceof ListPreference)
             preference.setSummary(((ListPreference)preference).getEntry());

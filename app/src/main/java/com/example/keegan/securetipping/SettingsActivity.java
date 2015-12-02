@@ -14,7 +14,5 @@ public class SettingsActivity extends AppCompatActivity {
 
         setContentView(R.layout.preference_toolbar);
         getFragmentManager().beginTransaction().replace(R.id.preference_frame,new SettingsFragment()).commit();
-
-
     }
 }

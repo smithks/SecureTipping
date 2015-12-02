@@ -237,7 +237,5 @@ public class HistoryFragment extends Fragment {
             refreshHistory();
             Toast.makeText(getContext(),getResources().getString(R.string.toast_delete_successful),Toast.LENGTH_SHORT).show();
         }
-
-
     }
 }
