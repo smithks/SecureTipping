@@ -426,22 +426,33 @@ public class CalculatorFragment extends Fragment {
         double total = bill + (bill * tipPercent);;
         if(TIP_METHOD.equals(TIPPING_METHODS[1])) {//palindrome
             if(total > 0) {
+                double totalMinus = total-1; //Calculate pattern for dollar values above and below total, use which is closest to original total
+                double totalPlus = total+1;
                 String choppedValue = Double.toString(total).split("\\.")[0]; //Cuts off amount following decimal (24.90 becomes 24)
-                if(Integer.parseInt(choppedValue)>0){ //Don't mirror a dollar value of 0
-                    double newTotal = mirrorAmount(choppedValue);
-                    if (newTotal < bill){ //In the case where new total is smaller than the original bill ($2.5 bill + .20 tip = $2.20 total)
-                        choppedValue = Double.toString(total+1).split("\\.")[0]; //Cuts off amount following decimal (24.90 becomes 24)
-                        newTotal = mirrorAmount(choppedValue);
-                    }
-                    total = newTotal;
+                String choppedValueMinus = Double.toString(totalMinus).split("\\.")[0];
+                String choppedValuePlus = Double.toString(totalPlus).split("\\.")[0];
 
-                    double newTipPercentage = (total - bill) / bill;
-                    if (Math.abs(newTipPercentage - tipPercent)>.30){ //If the difference is over 50 percent
-                        String newTipStr = getTipPercentString(newTipPercentage*100);
-                        mPercentWarningText.setText(getResources().getString(R.string.rounding_warning,newTipStr));
-                        mPercentWarningText.setVisibility(View.VISIBLE);
-                    }
+                totalMinus = mirrorAmount(choppedValueMinus);
+                totalPlus = mirrorAmount(choppedValuePlus);
+                double newTotal = mirrorAmount(choppedValue);
+
+                //Use pattern closest to original total
+                //Possible update, arrows to allow user to choose which pattern they want
+                double originalTotal = total;
+                double lowestDifference = Math.abs(originalTotal - totalPlus);
+                total = totalPlus;
+                if(Math.abs(originalTotal - newTotal) < lowestDifference && newTotal > bill) {
+                    lowestDifference = Math.abs(originalTotal-newTotal);
+                    total = newTotal;
                 }
+                if(Math.abs(originalTotal - totalMinus) < lowestDifference && totalMinus > bill) {
+                    total = totalMinus;
+                }
+
+                double newTipPercentage = (total - bill) / bill;
+                String newTipStr = getTipPercentString(newTipPercentage*100);
+                mPercentWarningText.setText(getResources().getString(R.string.rounding_warning,newTipStr));
+                mPercentWarningText.setVisibility(View.VISIBLE);
             }
         }
         updateEachPays(total, people);
@@ -449,7 +460,14 @@ public class CalculatorFragment extends Fragment {
         return total;
     }
 
+    /**
+     * Returns the mirrored amount
+     * @param amount a whole number to mirror
+     * @return the mirrored value, or 0 if input should not be mirrored
+     */
     private double mirrorAmount(String amount){
+        if (Integer.parseInt(amount) < 1)
+            return 0;
         String newTotalStr = amount;
         char[] chars = amount.toCharArray();
         if (chars.length == 1){

@@ -12,7 +12,7 @@
     </style>
     <style name="demo_text">
         <item name="android:textStyle">bold</item>
-        <item name="android:textSize">30sp</item>
+        <item name="android:textSize">22sp</item>
         <item name="android:textColor">@android:color/white</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_width">wrap_content</item>

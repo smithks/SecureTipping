@@ -2,7 +2,9 @@ package com.example.keegan.securetipping;
 
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -17,6 +19,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+
 /**
  * Parent activity that contains viewpager for the secure tipping app. View pager contains two
  * fragments, the calculator and a history fragment.
@@ -26,6 +31,7 @@ import android.widget.RelativeLayout;
 public class MainActivity extends AppCompatActivity {
 
     private CalculatorPagerAdapter mSectionsPagerAdapter;
+    SharedPreferences mSPref;
 
     /**
      * The {@link ViewPager} that will host the section contents.
@@ -73,7 +79,17 @@ public class MainActivity extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
-        showWelcomeDemo();
+        //Show welcome demo if this is the first launch
+        mSPref = PreferenceManager.getDefaultSharedPreferences(this);
+        //if(mSPref.getBoolean(getString(R.string.pref_is_first_launch_key),true))
+            showWelcomeDemo();
+
+        AdView adView = (AdView) findViewById(R.id.main_ad_view);
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                .addTestDevice("90B00D7879E8259B432B66C66559001B")
+                .build();
+        adView.loadAd(adRequest);
 
     }
 
@@ -116,6 +132,12 @@ public class MainActivity extends AppCompatActivity {
         final Dialog dialog = new Dialog(this, android.R.style.Theme_Translucent_NoTitleBar);
         dialog.setContentView(R.layout.demo_layout);
         RelativeLayout layout = (RelativeLayout) dialog.findViewById(R.id.transparent_demo);
+
+        //Only show the demo on first launch
+        SharedPreferences.Editor editor = mSPref.edit();
+        editor.putBoolean(getString(R.string.pref_is_first_launch_key),false);
+        editor.apply();
+
         layout.setOnClickListener(new View.OnClickListener() {
 
             @Override

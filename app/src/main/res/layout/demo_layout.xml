@@ -8,15 +8,35 @@
 
     <TextView
         android:id="@+id/welcome_text"
-        android:text="The safe way to tip!"
+        android:text="@string/demo_summary_string"
+        android:gravity="center_horizontal"
+        android:layout_centerHorizontal="true"
         style="@style/demo_text"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="10dp"
     />
 
     <ImageView
+        android:id="@+id/image_example_demo"
         android:layout_width="wrap_content"
         android:layout_height="150dp"
         android:src="@drawable/palindromeexamplewhite"
         android:layout_below="@id/welcome_text"
         android:layout_centerHorizontal="true"
     />
+
+    <TextView
+        android:id="@+id/welcome_text2"
+        android:text="@string/demo_summary2_string"
+        android:layout_below="@id/image_example_demo"
+        style="@style/demo_text"
+        android:gravity="center_horizontal"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="20dp"
+        />
 </RelativeLayout>

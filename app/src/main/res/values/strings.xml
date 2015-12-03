@@ -1,16 +1,19 @@
 <resources>
+    <!-- App name -->
     <string name="app_name">SecureTipping</string>
+    
+    <!-- Menu Items -->
     <string name="action_settings">Settings</string>
-    <string name="ok">OK</string>
-    <string name="cancel">Cancel</string>
+    <string name="about_menu_action">About Palindrome Tipping</string>
 
     <!-- Preferences -->
-    <string name="pref_method_label">Calculation method</string>
-    <string name="pref_method_default" translatable="false">normal</string>
-    <string name="pref_method_key" translatable="false">method</string>
+    <string name="pref_is_first_launch_key">firstLaunch</string>
     <string name="pref_tip_label">Default tip percent</string>
-    <integer name="pref_tip_default">15</integer>
+    <integer name="pref_tip_default">17</integer>
     <string name="pref_tip_key">defaultTip</string>
+    <string name="pref_method_label">Calculation method</string>
+    <string name="pref_method_default" translatable="false">palindrome</string>
+    <string name="pref_method_key" translatable="false">method</string>
     <string-array name="tipping_method_array_entries">
         <item>Normal</item>
         <item>Palindrome</item>
@@ -62,8 +65,12 @@
     <string name="alert_dialog_delete_negative">Cancel</string>
     <string name="date_item_today">Today</string>
 
+    <!-- Demo screen -->
+    <string name="demo_summary_string">Make your restaurant transactions easily recognizable! \n\nType in your bill amount and ideal
+        tip percentage and we do the rest! Here\'s an example of the pattern.</string>
+    <string name="demo_summary2_string">See the about page for more info! \n\nTap to get started!</string>
+
     <!-- About activity -->
-    <string name="about_menu_action">About Palindrome Tipping</string>
     <string name="example_content_description">Example of palindrome tipping</string>
     <string name="about_body">In short, palindrome tipping is the secure way to tip.
         \n\n
@@ -77,7 +84,7 @@
         mirroring the numbers in the ones and tens place and setting that mirrored amount on the right side of the decimal.
 
     </string>
-    <string name="about_body2">The power of palindrome tipping lies in creating a pattern for your total that you will be able to instantly recognize when scanning
+    <string name="about_body2">Since we are altering the total we include a message telling you the actual tip percentage used.\n\nThe power of palindrome tipping lies in creating a pattern for your total that you will be able to instantly recognize when scanning
         your credit card statement.
         \n\n
         If you notice a charge to your credit card from a restaurant and it does not follow the palindrome pattern then you know
@@ -93,7 +100,10 @@
         Tip at 17 percent: $0.20 \n
         Total: $1.35 \n
         \nTo make this total follow the palindrome pattern we would need to round the total up to $2.20 since rounding down to $1.10 would be less than the original bill.
-        Rounding to a total of $2.20 would mean a 91 percent tip of $1.05! \n\n A warning message is displayed if the actual tip percentage is
-        30 percent greater than your requested percentage and we recommend switching to normal tip calculations for these low values.
+        Rounding to a total of $2.20 would mean a 91 percent tip of $1.05! \n\n The pattern also does not work for any amount less than $1.00 because there is nothing to mirror ($0.23 mirrored is $0.00).
+        In these cases you can switch to normal tipping from settings.
     </string>
+
+    <!-- Advert IDs -->
+    <string name="main_banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
 </resources>
