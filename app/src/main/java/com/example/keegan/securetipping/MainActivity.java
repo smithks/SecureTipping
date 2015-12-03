@@ -1,5 +1,6 @@
 package com.example.keegan.securetipping;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
@@ -12,7 +13,9 @@ import android.support.v7.widget.Toolbar;
 import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 
 /**
  * Parent activity that contains viewpager for the secure tipping app. View pager contains two
@@ -47,7 +50,8 @@ public class MainActivity extends AppCompatActivity {
 
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            }
 
             /**
              * Refreshes the listView in the history fragment whenever the user moves to it.
@@ -56,17 +60,20 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPageSelected(int position) {
                 CalculatorPagerAdapter fragmentPagerAdapter = (CalculatorPagerAdapter) mViewPager.getAdapter();
-                if(position == HISTORY_PAGE_INDEX)
-                    ((HistoryFragment)fragmentPagerAdapter.getRegisteredFragment(position)).refreshHistory();
+                if (position == HISTORY_PAGE_INDEX)
+                    ((HistoryFragment) fragmentPagerAdapter.getRegisteredFragment(position)).refreshHistory();
 
             }
 
             @Override
-            public void onPageScrollStateChanged(int state) {}
+            public void onPageScrollStateChanged(int state) {
+            }
         });
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
+
+        showWelcomeDemo();
 
     }
 
@@ -100,6 +107,23 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Displays the welcome demo if this is the first time running the app.
+     */
+    public void showWelcomeDemo(){
+        final Dialog dialog = new Dialog(this, android.R.style.Theme_Translucent_NoTitleBar);
+        dialog.setContentView(R.layout.demo_layout);
+        RelativeLayout layout = (RelativeLayout) dialog.findViewById(R.id.transparent_demo);
+        layout.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
     }
 
     /**
